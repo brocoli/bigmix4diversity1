@@ -8,7 +8,7 @@ namespace Assets.Pieces
 {
     public class PieceRandomizer : MonoBehaviour
     {
-        public GameObject piecePrefab;
+        public GameObject PiecePrefab;
         public Transform SpawnPoint;
 
         public int Min;
@@ -35,7 +35,7 @@ namespace Assets.Pieces
             SpawnPoint.position = new Vector3(posX, SpawnPoint.position.y, SpawnPoint.position.z);
             SpawnPoint.rotation =
                 new Quaternion(SpawnPoint.rotation.x, SpawnPoint.rotation.y, rotZ, SpawnPoint.rotation.w);
-            Instantiate(piecePrefab, SpawnPoint.position, SpawnPoint.rotation);
+            Instantiate(PiecePrefab, SpawnPoint.position, SpawnPoint.rotation);
 
             _timer = 0;
         }

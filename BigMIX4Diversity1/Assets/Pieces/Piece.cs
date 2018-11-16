@@ -6,11 +6,12 @@ namespace Assets.Pieces
 {
     public class Piece : MonoBehaviour
     {
-        public int minSegments = 3;
-        public int maxSegments = 5;
+        public int MinSegments = 3;
+        public int MaxSegments = 5;
 
-        public float baseRadius = 1f;
-        public float defectDeviation = 0.2f;
+        public float BaseRadius = 3.5f;
+        public float OutsetDeviation = 2f;
+        public float InsetDeviation = 2f;
 
         // Use this for initialization
         void Start()
@@ -23,7 +24,7 @@ namespace Assets.Pieces
 
         private Vector2[] GenerateVertices()
         {
-            var vertices = Random.Range(minSegments, maxSegments + 1);
+            var vertices = Random.Range(MinSegments, MaxSegments + 1);
             var partitions = PartitionCircleInterval(vertices);
 
             return ConvertPartitionsTo2D(partitions);
@@ -83,8 +84,8 @@ namespace Assets.Pieces
 
             partitions.ForEach(scalar =>
             {
-                var deviation = Random.Range(-defectDeviation, defectDeviation + Mathf.Epsilon);
-                var radius = baseRadius + deviation;
+                var deviation = Random.Range(-InsetDeviation, OutsetDeviation + Mathf.Epsilon);
+                var radius = BaseRadius + deviation;
 
                 points.Add(new Vector2(Mathf.Cos(scalar) * radius, Mathf.Sin(scalar) * radius));
             });
