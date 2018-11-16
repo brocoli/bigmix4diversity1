@@ -7,7 +7,7 @@ namespace Assets.Pieces
     public class Piece : MonoBehaviour
     {
         public int minSegments = 3;
-        public int maxSegments = 7;
+        public int maxSegments = 5;
 
         public float baseRadius = 1f;
         public float defectDeviation = 0.2f;
@@ -23,7 +23,7 @@ namespace Assets.Pieces
 
         private Vector2[] GenerateVertices()
         {
-            var vertices = Random.Range(minSegments, maxSegments);
+            var vertices = Random.Range(minSegments, maxSegments + 1);
             var partitions = PartitionCircleInterval(vertices);
 
             return ConvertPartitionsTo2D(partitions);
