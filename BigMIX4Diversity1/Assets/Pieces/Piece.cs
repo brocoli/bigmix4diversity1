@@ -12,7 +12,7 @@ namespace Assets.Pieces
         public Material[] Materials;
         public float VelY = -0.5f;
 
-        private static readonly int _amountReferencePoints = 201;
+        private static readonly int _amountReferencePoints = 101;
         private static readonly Vector2[] ReferencePoints = new Vector2[_amountReferencePoints];
         private static bool _hasReferencePoints = false;
 
@@ -49,7 +49,7 @@ namespace Assets.Pieces
             {
                 for (var i = 0; i < _amountReferencePoints; i++)
                 {
-                    ReferencePoints[i] = new Vector2((float)(i - (_amountReferencePoints - 1)/2) /2, -12f);
+                    ReferencePoints[i] = new Vector2((float)(i - (_amountReferencePoints - 1)/2), -12f);
                 }
                 _hasReferencePoints = true;
             }
@@ -155,7 +155,7 @@ namespace Assets.Pieces
                     if (hit.collider != null)
                     {
                         var piece = hit.collider.gameObject.GetComponent<Piece>();
-                        if (piece != null)
+                        if (piece != null && !piece._isInPlay)
                         {
                             _touchFocus = piece;
                             _touchFocus.OnPieceTouchDown();
@@ -281,10 +281,10 @@ namespace Assets.Pieces
                         _maxReferenceY = referencePoint.y;
 
                         var cameraTransform = CameraRef.transform;
-                        cameraTransform.DOMoveY((_cameraDelta + _maxReferenceY) / 3f, 0.3f);
+                        cameraTransform.DOMoveY((_cameraDelta + _maxReferenceY) / 2.8f, 0.3f);
 
                         var spawnerPos = PieceRandomizer.transform.position;
-                        spawnerPos.y = (_pieceRandomizerDelta + _maxReferenceY) / 1.7f;
+                        spawnerPos.y = (_pieceRandomizerDelta + _maxReferenceY) / 1.6f;
                         PieceRandomizer.transform.position = spawnerPos;
                     }
                 }
