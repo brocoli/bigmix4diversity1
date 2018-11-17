@@ -241,14 +241,14 @@ namespace Assets.Pieces
                 RaycastHit2D[] hits = new RaycastHit2D[99];
 
                 
-                var hitFromBelow = Physics2D.Raycast(referencePoint, Vector2.up);
+                var hitFromBelow = Physics2D.Raycast(new Vector2(referencePoint.x, _polygonCollider2D.bounds.min.y - float.Epsilon), Vector2.up);
                 if (hitFromBelow.collider != _polygonCollider2D)
                 {
                     continue;
                 }
 
                 var hitY = hitFromBelow.point.y;
-                var hitFromAbove = Physics2D.Raycast(new Vector2(referencePoint.x, hitY + 30f), Vector2.down);
+                var hitFromAbove = Physics2D.Raycast(new Vector2(referencePoint.x, _polygonCollider2D.bounds.max.y + float.Epsilon), Vector2.down);
                 Debug.Assert(hitFromAbove.collider != null, "wtf is this? I can hit from below but not above?");
 
                 affectedReferencePoints.Add(i);
@@ -281,10 +281,6 @@ namespace Assets.Pieces
                         _maxReferenceY = referencePoint.y;
 
                         var cameraTransform = CameraRef.transform;
-                        //var cameraPos = cameraTransform.position;
-                        //cameraPos.y = (_cameraDelta + _maxReferenceY)/4f;
-                        //CameraRef.transform.position = cameraPos;
-
                         cameraTransform.DOMoveY((_cameraDelta + _maxReferenceY) / 3f, 0.3f);
 
                         var spawnerPos = PieceRandomizer.transform.position;
