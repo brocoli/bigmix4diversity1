@@ -15,8 +15,6 @@ namespace Assets.Pieces
         private static readonly Vector2[] ReferencePoints = new Vector2[_amountReferencePoints];
         private static bool _hasReferencePoints = false;
 
-        private float _pieceZ = 0f;
-
         private PolygonCollider2D _polygonCollider2D;
         private bool _lastMouse0Up;
         private bool _isInPlay;
@@ -26,12 +24,10 @@ namespace Assets.Pieces
         public void Awake()
         {
             _transform = GetComponent<Transform>();
+            _transform.SetAsFirstSibling();
 
             var pos = _transform.position;
-            pos.z = _pieceZ;
             _transform.position = pos;
-
-            _pieceZ += 0.01f;
 
             if (!_hasReferencePoints)
             {
