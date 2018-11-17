@@ -57,6 +57,7 @@ namespace Assets.Pieces
 
             var newPieceObject = Instantiate(PiecePrefab, position, rotation);
             var newPiece = newPieceObject.GetComponent<Piece>();
+            newPiece.PieceRandomizer = this;
 
             newPiece.InitVertices(vertices2D);
             _pieces[slot] = newPiece;

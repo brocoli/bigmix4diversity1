@@ -220,6 +220,26 @@ Prefab:
       propertyPath: Spawner
       value: 
       objectReference: {fileID: 1401263686}
+    - target: {fileID: 114608762088961486, guid: 276b2ec253e29414da863d3bad88878a,
+        type: 2}
+      propertyPath: TextFadeTime
+      value: 0.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 114608762088961486, guid: 276b2ec253e29414da863d3bad88878a,
+        type: 2}
+      propertyPath: TextTime
+      value: 0.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 114608762088961486, guid: 276b2ec253e29414da863d3bad88878a,
+        type: 2}
+      propertyPath: ExtraDelay
+      value: 0.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 114608762088961486, guid: 276b2ec253e29414da863d3bad88878a,
+        type: 2}
+      propertyPath: ZoomPeriod
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 276b2ec253e29414da863d3bad88878a, type: 2}
   m_IsPrefabAsset: 0

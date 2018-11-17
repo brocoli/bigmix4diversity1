@@ -27,6 +27,14 @@ namespace Assets.Pieces
         private static Piece _touchFocus;
         private static Piece _touchController;
 
+        private static float _maxReferenceY = -12f;
+
+        public PieceRandomizer PieceRandomizer;
+        private static float _pieceRandomizerDelta;
+
+        public Camera CameraRef;
+        private static float _cameraDelta;
+
         public void Awake()
         {
             _transform = GetComponent<Transform>();
@@ -48,6 +56,11 @@ namespace Assets.Pieces
             {
                 _touchController = this;
             }
+
+            CameraRef = Camera.main;
+            _cameraDelta = CameraRef.transform.position.y + 12f;
+
+            _pieceRandomizerDelta = 24f;
         }
 
         public void InitVertices(Vector2[] vertices2D)
@@ -256,8 +269,21 @@ namespace Assets.Pieces
                 var landedReferencePoint = hitFromAbove - maxDeltaY;
                 if (landedReferencePoint >= referencePoint.y)
                 {
-                    referencePoint.y = landedReferencePoint + 1f;
+                    referencePoint.y = landedReferencePoint + 0.5f;
                     ReferencePoints[j] = referencePoint;
+
+                    if (referencePoint.y > _maxReferenceY)
+                    {
+                        _maxReferenceY = referencePoint.y;
+
+                        var cameraPos = CameraRef.transform.position;
+                        cameraPos.y = (_cameraDelta + _maxReferenceY)/3f;
+                        CameraRef.transform.position = cameraPos;
+
+                        var spawnerPos = PieceRandomizer.transform.position;
+                        spawnerPos.y = _pieceRandomizerDelta + _maxReferenceY;
+                        PieceRandomizer.transform.position = spawnerPos;
+                    }
                 }
             }
             
