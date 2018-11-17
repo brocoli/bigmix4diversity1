@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using Debug = System.Diagnostics.Debug;
 using Random = UnityEngine.Random;
@@ -61,7 +62,7 @@ namespace Assets.Pieces
             CameraRef = Camera.main;
             _cameraDelta = CameraRef.transform.position.y + 12f;
 
-            _pieceRandomizerDelta = 20f;
+            _pieceRandomizerDelta = 24f;
         }
 
         public void InitVertices(Vector2[] vertices2D)
@@ -279,12 +280,15 @@ namespace Assets.Pieces
                     {
                         _maxReferenceY = referencePoint.y;
 
-                        var cameraPos = CameraRef.transform.position;
-                        cameraPos.y = (_cameraDelta + _maxReferenceY)/3f;
-                        CameraRef.transform.position = cameraPos;
+                        var cameraTransform = CameraRef.transform;
+                        //var cameraPos = cameraTransform.position;
+                        //cameraPos.y = (_cameraDelta + _maxReferenceY)/4f;
+                        //CameraRef.transform.position = cameraPos;
+
+                        cameraTransform.DOMoveY((_cameraDelta + _maxReferenceY) / 3f, 0.3f);
 
                         var spawnerPos = PieceRandomizer.transform.position;
-                        spawnerPos.y = _pieceRandomizerDelta + _maxReferenceY;
+                        spawnerPos.y = (_pieceRandomizerDelta + _maxReferenceY) / 1.7f;
                         PieceRandomizer.transform.position = spawnerPos;
                     }
                 }

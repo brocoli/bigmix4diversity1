@@ -309,17 +309,17 @@ Prefab:
     - target: {fileID: 114814972187991440, guid: 807b1b37aff75c64da86ce36726503fb,
         type: 2}
       propertyPath: OutsetDeviation
-      value: 0
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 114814972187991440, guid: 807b1b37aff75c64da86ce36726503fb,
         type: 2}
       propertyPath: InsetDeviation
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 114814972187991440, guid: 807b1b37aff75c64da86ce36726503fb,
         type: 2}
       propertyPath: MinTriangleAreaPerSidesMinusTwo
-      value: 0
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 114814972187991440, guid: 807b1b37aff75c64da86ce36726503fb,
         type: 2}
@@ -329,6 +329,11 @@ Prefab:
     - target: {fileID: 1479936603810774, guid: 807b1b37aff75c64da86ce36726503fb, type: 2}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114814972187991440, guid: 807b1b37aff75c64da86ce36726503fb,
+        type: 2}
+      propertyPath: MaxSegments
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 807b1b37aff75c64da86ce36726503fb, type: 2}
@@ -464,7 +469,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1347212969}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 100, z: 0}
+  m_LocalPosition: {x: 0, y: 100, z: 10}
   m_LocalScale: {x: 3.4, y: 3.4, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
