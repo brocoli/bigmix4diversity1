@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
-using Random = System.Random;
 
 namespace Assets.Pieces
 {
@@ -19,18 +16,11 @@ namespace Assets.Pieces
         public float InsetDeviation = 2.5f;
         public float MinTriangleAreaPerSidesMinusTwo = 6f;
 
-        public int MinSpawnX = -5;
-        public int MaxSpawnX = 5;
+        public float MinSpawnX = -5f;
+        public float MaxSpawnX = 5f;
 
         public float SpawnPeriod = 1f;
         private float _timer;
-
-        private Random _random;
-
-        public void Awake()
-        {
-            _random = new Random();
-        }
 
         public void Update()
         {
@@ -40,14 +30,14 @@ namespace Assets.Pieces
                 return;
             }
 
-            var posX = _random.Next(MinSpawnX, MaxSpawnX);
-            var rotZ = _random.Next(0, 360);
+            var posX = Random.Range(MinSpawnX, MaxSpawnX);
+            var rotZ = Random.Range(0, 360);
 
             SpawnPoint.position = new Vector3(posX, SpawnPoint.position.y, SpawnPoint.position.z);
             SpawnPoint.rotation =
                 new Quaternion(SpawnPoint.rotation.x, SpawnPoint.rotation.y, rotZ, SpawnPoint.rotation.w);
 
-            var amountVertices = UnityEngine.Random.Range(MinSegments, MaxSegments + 1);
+            var amountVertices = Random.Range(MinSegments, MaxSegments + 1);
             var vertices2D = GenerateGoodVertices(amountVertices);
             var piece = Instantiate(PiecePrefab, SpawnPoint.position, SpawnPoint.rotation);
             piece.SendMessage("InitVertices", vertices2D);
@@ -68,6 +58,7 @@ namespace Assets.Pieces
                     tries += 1;
                     if (tries > 500)
                     {
+                        print("Warning! piece spawn rules are too strict.");
                         break;
                     }
                 }
@@ -89,8 +80,6 @@ namespace Assets.Pieces
             var triangulator = new Triangulator(vertices2D.ToArray());
             var indices = triangulator.Triangulate();
 
-            var fullArea = Triangulator.Area(vertices2D);
-
             for (var i = 0; i < Mathf.RoundToInt((float)indices.Length / (float)3); i++)
             {
                 var triangle = new List<Vector2>
@@ -99,17 +88,11 @@ namespace Assets.Pieces
                 };
 
                 var triangleArea = Mathf.Abs(Triangulator.Area(triangle));
-                print(triangleArea);
-                fullArea -= triangleArea;
-
                 if (triangleArea < MinTriangleAreaPerSidesMinusTwo/(amountVertices-2))
                 {
                     return null;
                 }
             }
-
-            print("The full area decremented is");
-            print(fullArea);
 
             return vertices2D.ToArray();
         }
@@ -126,9 +109,8 @@ namespace Assets.Pieces
 
             partitions.ForEach(scalar =>
             {
-                var deviation = UnityEngine.Random.Range(-InsetDeviation, OutsetDeviation + Mathf.Epsilon);
+                var deviation = Random.Range(-InsetDeviation, OutsetDeviation + Mathf.Epsilon);
                 var radius = BaseRadius + deviation;
-                //var radius = BaseRadius;
 
                 points.Add(new Vector2(Mathf.Cos(scalar) * radius, Mathf.Sin(scalar) * radius));
             });
@@ -142,7 +124,7 @@ namespace Assets.Pieces
 
             for (var i = 0; i < vertices; i++)
             {
-                partitions.Add(UnityEngine.Random.Range(0, 2 * Mathf.PI));
+                partitions.Add(Random.Range(0, 2 * Mathf.PI));
             }
 
             partitions.Sort();
