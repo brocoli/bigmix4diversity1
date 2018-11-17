@@ -144,8 +144,6 @@ namespace Assets.Pieces
 
         private void Update()
         {
-            transform.SetAsFirstSibling();
-
             if (_touchController == this)
             {
                 if (Input.GetKeyDown(KeyCode.Mouse0))
