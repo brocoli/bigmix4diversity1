@@ -16,33 +16,56 @@ namespace Assets.Pieces
         public float InsetDeviation = 2.5f;
         public float MinTriangleAreaPerSidesMinusTwo = 6f;
 
-        public float MinSpawnX = -5f;
-        public float MaxSpawnX = 5f;
+        public float SpawnDistance = 5f;
 
-        public float SpawnPeriod = 1f;
-        private float _timer;
+        private readonly Piece[] _pieces = new Piece[3];
+
+        public void Start()
+        {
+            for (var i = 0; i < 3; i++)
+            {
+                SpawnPiece(i);
+            }
+        }
 
         public void Update()
         {
-            _timer = _timer + Time.deltaTime;
-            if (!(_timer >= SpawnPeriod))
+            for (var i = 0; i < _pieces.Length; i++)
             {
-                return;
+                var piece = _pieces[i];
+
+                if (piece == null || !piece.IsInPlay())
+                {
+                    continue;
+                }
+
+                _pieces[i] = null;
+                StartCoroutine(SpawnAfter(2, i));
             }
+        }
 
-            var posX = Random.Range(MinSpawnX, MaxSpawnX);
+        private void SpawnPiece(int slot)
+        {
             var rotZ = Random.Range(0, 360);
+            var posX = SpawnPoint.position.x + (slot - 1) * SpawnDistance;
 
-            SpawnPoint.position = new Vector3(posX, SpawnPoint.position.y, SpawnPoint.position.z);
-            SpawnPoint.rotation =
-                new Quaternion(SpawnPoint.rotation.x, SpawnPoint.rotation.y, rotZ, SpawnPoint.rotation.w);
+            var position = new Vector3(posX, SpawnPoint.position.y, SpawnPoint.position.z);
+            var rotation = new Quaternion(SpawnPoint.rotation.x, SpawnPoint.rotation.y, rotZ, SpawnPoint.rotation.w);
 
             var amountVertices = Random.Range(MinSegments, MaxSegments + 1);
             var vertices2D = GenerateGoodVertices(amountVertices);
-            var piece = Instantiate(PiecePrefab, SpawnPoint.position, SpawnPoint.rotation);
-            piece.SendMessage("InitVertices", vertices2D);
 
-            _timer = 0;
+            var newPieceObject = Instantiate(PiecePrefab, position, rotation);
+            var newPiece = newPieceObject.GetComponent<Piece>();
+
+            newPiece.InitVertices(vertices2D);
+            _pieces[slot] = newPiece;
+        }
+
+        private IEnumerator<WaitForSeconds> SpawnAfter(int seconds, int slot)
+        {
+            yield return new WaitForSeconds(seconds);
+            SpawnPiece(slot);
         }
 
         private Vector2[] GenerateGoodVertices(int amountVertices)
@@ -58,7 +81,7 @@ namespace Assets.Pieces
                     tries += 1;
                     if (tries > 500)
                     {
-                        print("Warning! piece spawn rules are too strict.");
+                        print("Warning! piece spawn constraints are too strict.");
                         break;
                     }
                 }

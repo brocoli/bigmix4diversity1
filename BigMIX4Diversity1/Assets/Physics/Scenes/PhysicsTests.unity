@@ -180,7 +180,7 @@ BoxCollider2D:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 382339604}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 6200000, guid: f3060f25de02dd94988b33acbb1ed5b7, type: 2}
   m_IsTrigger: 0
@@ -205,7 +205,7 @@ SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 382339604}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -407,7 +407,22 @@ Prefab:
     - target: {fileID: 114814972187991440, guid: 807b1b37aff75c64da86ce36726503fb,
         type: 2}
       propertyPath: MinTriangleAreaPerSidesMinusTwo
-      value: 6
+      value: 2.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114814972187991440, guid: 807b1b37aff75c64da86ce36726503fb,
+        type: 2}
+      propertyPath: BaseRadius
+      value: 1.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 114814972187991440, guid: 807b1b37aff75c64da86ce36726503fb,
+        type: 2}
+      propertyPath: OutsetDeviation
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114814972187991440, guid: 807b1b37aff75c64da86ce36726503fb,
+        type: 2}
+      propertyPath: InsetDeviation
+      value: 1.25
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 807b1b37aff75c64da86ce36726503fb, type: 2}
@@ -472,7 +487,7 @@ BoxCollider2D:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1145551900}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 6200000, guid: f3060f25de02dd94988b33acbb1ed5b7, type: 2}
   m_IsTrigger: 0
@@ -497,7 +512,7 @@ SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1145551900}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1

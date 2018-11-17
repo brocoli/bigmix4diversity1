@@ -8,6 +8,14 @@ namespace Assets.Pieces
     public class Piece : MonoBehaviour
     {
         public Material[] Materials;
+        public PhysicsMaterial2D PhysicsMaterial2D;
+
+        private PolygonCollider2D _polygonCollider2D;
+        private Rigidbody2D _rigidBody2D;
+        private bool _lastMouse0Up;
+        private int _stillForNUpdates;
+
+        private bool _isInPlay;
 
         public void InitVertices(Vector2[] vertices2D)
         {
@@ -17,10 +25,10 @@ namespace Assets.Pieces
 
         private void BuildCollider(Vector2[] vertices2D)
         {
-            var polygonCollider2D = gameObject.AddComponent(typeof(PolygonCollider2D)) as PolygonCollider2D;
-            Debug.Assert(polygonCollider2D != null, nameof(polygonCollider2D) + " != null");
+            _polygonCollider2D = gameObject.AddComponent(typeof(PolygonCollider2D)) as PolygonCollider2D;
+            Debug.Assert(_polygonCollider2D != null, nameof(_polygonCollider2D) + " != null");
 
-            polygonCollider2D.SetPath(0, vertices2D);
+            _polygonCollider2D.SetPath(0, vertices2D);
         }
 
         private void BuildMesh(Vector2[] vertices2D)
@@ -85,6 +93,76 @@ namespace Assets.Pieces
             }
 
             return uv;
+        }
+
+        private void Update()
+        {
+            _lastMouse0Up = Input.GetKeyUp(KeyCode.Mouse0);
+        }
+
+        private void FixedUpdate()
+        {
+            if (_lastMouse0Up)
+            {
+                _lastMouse0Up = false;
+
+                var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                var hit = Physics2D.Raycast(pos, Vector2.zero);
+
+                if (hit.collider != null && hit.collider == _polygonCollider2D)
+                {
+                    _stillForNUpdates = 0;
+                    PutIntoPlay();
+                    SetDynamic();
+                }
+            }
+
+            if (_rigidBody2D != null && _rigidBody2D.velocity.magnitude <= Mathf.Epsilon)
+            {
+                _stillForNUpdates += 1;
+                if (_stillForNUpdates > 4)
+                {
+                    SetStatic();
+                }
+            }
+            else
+            {
+                _stillForNUpdates = 0;
+            }
+        }
+
+        private void PutIntoPlay()
+        {
+            _isInPlay = true;
+        }
+
+        public bool IsInPlay()
+        {
+            return _isInPlay;
+        }
+
+        private void SetDynamic()
+        {
+            if (_rigidBody2D != null)
+            {
+                return;
+            }
+
+            _rigidBody2D = gameObject.AddComponent(typeof(Rigidbody2D)) as Rigidbody2D;
+            Debug.Assert(_rigidBody2D != null, nameof(_rigidBody2D) + " != null");
+
+            _rigidBody2D.sharedMaterial = PhysicsMaterial2D;
+        }
+
+        private void SetStatic()
+        {
+            if (_rigidBody2D == null)
+            {
+                return;
+            }
+
+            Destroy(_rigidBody2D);
+            _rigidBody2D = null;
         }
     }
 }

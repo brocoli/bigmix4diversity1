@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4577645933361986}
   - component: {fileID: 114536370756398098}
-  - component: {fileID: 50088875180936222}
   m_Layer: 0
   m_Name: Piece
   m_TagString: Untagged
@@ -41,26 +40,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!50 &50088875180936222
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1567295567445702}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 6200000, guid: 8e10986184f37e14885c5c4410a97a4c, type: 2}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
 --- !u!114 &114536370756398098
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -81,3 +60,4 @@ MonoBehaviour:
   - {fileID: 2100000, guid: cadb58b1478f10247981495d2caf282d, type: 2}
   - {fileID: 2100000, guid: 60b19cb2dd1270a4d82ecc5626ac5b44, type: 2}
   - {fileID: 2100000, guid: c95ac051a06f13e4fbea780a95e5ec0a, type: 2}
+  PhysicsMaterial2D: {fileID: 6200000, guid: 8e10986184f37e14885c5c4410a97a4c, type: 2}
