@@ -72,3 +72,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be1468ba754e95a41bf3a1df57f3c588, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Materials:
+  - {fileID: 2100000, guid: 0e62dd239b3500c44b96050e8accb27a, type: 2}
+  - {fileID: 2100000, guid: 40df8938db9baa04d8c4823743687767, type: 2}
+  - {fileID: 2100000, guid: 4dd9ced4bfd043c48b6eca7be5047161, type: 2}
+  - {fileID: 2100000, guid: 07039845339ac7943a9f4c7a2893ae5b, type: 2}
+  - {fileID: 2100000, guid: 9237cfc99c0c4b34d80d1d8a3f4ef7d6, type: 2}
+  - {fileID: 2100000, guid: cadb58b1478f10247981495d2caf282d, type: 2}
+  - {fileID: 2100000, guid: 60b19cb2dd1270a4d82ecc5626ac5b44, type: 2}
+  - {fileID: 2100000, guid: c95ac051a06f13e4fbea780a95e5ec0a, type: 2}

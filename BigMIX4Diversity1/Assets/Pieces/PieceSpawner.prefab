@@ -55,11 +55,11 @@ MonoBehaviour:
     type: 2}
   SpawnPoint: {fileID: 4222341905609132}
   MinSegments: 3
-  MaxSegments: 5
+  MaxSegments: 6
   BaseRadius: 3.5
   OutsetDeviation: 1
-  InsetDeviation: 1
-  MinTriangleArea: 5
-  Min: -4
-  Max: 4
-  Limit: 1
+  InsetDeviation: 2.5
+  MinTriangleAreaPerSidesMinusTwo: 5
+  MinSpawnX: 0
+  MaxSpawnX: 0
+  SpawnPeriod: 0

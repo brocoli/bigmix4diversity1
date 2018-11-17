@@ -71,9 +71,9 @@ namespace Assets.Pieces
             }
 
             var deltaX = maxX - minX;
-            var midX = (maxX + minX) / 2;
+            var midX = (maxX + minX)/2;
             var deltaY = maxY - minY;
-            var midY = (maxY + minY) / 2;
+            var midY = (maxY + minY)/2;
 
             var delta = Mathf.Max(deltaX, deltaY);
 
@@ -81,7 +81,7 @@ namespace Assets.Pieces
             for (var i = 0; i < amountVertices; i++)
             {
                 var vertex = vertices2D[i];
-                uv[i] = new Vector2(0.5f + ((vertex.x - midX) / delta), 0.5f + ((vertex.y - midY) / delta));
+                uv[i] = new Vector2(0.5f + (vertex.x - midX)/delta, 0.5f + (vertex.y - midY)/delta);
             }
 
             return uv;
