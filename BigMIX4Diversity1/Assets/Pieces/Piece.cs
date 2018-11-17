@@ -21,6 +21,9 @@ namespace Assets.Pieces
         private Transform _transform;
         private float _finalY = float.NegativeInfinity;
 
+        private Vector2 _mouseDownPointerPos;
+        private Vector2 _mouseDownPiecePos;
+
         public void Awake()
         {
             _transform = GetComponent<Transform>();
@@ -119,11 +122,37 @@ namespace Assets.Pieces
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Mouse0))
+            {
+                var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                var piecePos = _transform.position;
+
+                _mouseDownPointerPos = new Vector2(mousePos.x, mousePos.y);
+                _mouseDownPiecePos = new Vector2(piecePos.x, piecePos.y);
+            }
+
             _lastMouse0Up = Input.GetKeyUp(KeyCode.Mouse0);
         }
 
         private void FixedUpdate()
         {
+            if (Input.GetKey(KeyCode.Mouse0))
+            {
+                var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                var hit = Physics2D.Raycast(pos, Vector2.zero);
+
+                if (hit.collider != null && hit.collider == _polygonCollider2D)
+                {
+                    var deltaPosX = pos.x - _mouseDownPointerPos.x;
+                    var deltaPosY = pos.y - _mouseDownPointerPos.y;
+
+                    var piecePos = _transform.position;
+                    piecePos.x = _mouseDownPiecePos.x + deltaPosX;
+                    piecePos.y = _mouseDownPiecePos.y + deltaPosY;
+                    _transform.position = piecePos;
+                }
+            }
+
             if (_lastMouse0Up && !_isInPlay)
             {
                 _lastMouse0Up = false;
@@ -167,13 +196,13 @@ namespace Assets.Pieces
                     continue;
                 }
 
-                var hitFromAbove = Physics2D.Raycast(new Vector2(referencePoint.x, 100f), Vector2.down);
+                var hitY = hitFromBelow.point.y;
+                var hitFromAbove = Physics2D.Raycast(new Vector2(referencePoint.x, hitY + 30f), Vector2.down);
                 Debug.Assert(hitFromAbove.collider != null, "wtf is this? I can hit from below but not above?");
 
                 affectedReferencePoints.Add(i);
                 hitsFromAbove.Add(hitFromAbove.point.y);
 
-                var hitY = hitFromBelow.point.y;
                 var deltaY = hitY - referencePoint.y;
                 if (maxDeltaY < deltaY)
                 {
