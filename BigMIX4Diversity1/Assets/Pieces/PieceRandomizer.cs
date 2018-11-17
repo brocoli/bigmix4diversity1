@@ -13,16 +13,16 @@ namespace Assets.Pieces
         public Transform SpawnPoint;
 
         public int MinSegments = 3;
-        public int MaxSegments = 5;
+        public int MaxSegments = 6;
         public float BaseRadius = 3.5f;
-        public float OutsetDeviation = 2f;
-        public float InsetDeviation = 2f;
-        public float MinTriangleArea = 5f;
+        public float OutsetDeviation = 1f;
+        public float InsetDeviation = 2.5f;
+        public float MinTriangleAreaPerSidesMinusTwo = 6f;
 
-        public int Min;
-        public int Max;
+        public int MinSpawnX = -5;
+        public int MaxSpawnX = 5;
 
-        public float Limit;
+        public float SpawnPeriod = 1f;
         private float _timer;
 
         private Random _random;
@@ -35,12 +35,12 @@ namespace Assets.Pieces
         public void Update()
         {
             _timer = _timer + Time.deltaTime;
-            if (!(_timer >= Limit))
+            if (!(_timer >= SpawnPeriod))
             {
                 return;
             }
 
-            var posX = _random.Next(Min, Max);
+            var posX = _random.Next(MinSpawnX, MaxSpawnX);
             var rotZ = _random.Next(0, 360);
 
             SpawnPoint.position = new Vector3(posX, SpawnPoint.position.y, SpawnPoint.position.z);
@@ -102,7 +102,7 @@ namespace Assets.Pieces
                 print(triangleArea);
                 fullArea -= triangleArea;
 
-                if (triangleArea < MinTriangleArea)
+                if (triangleArea < MinTriangleAreaPerSidesMinusTwo/(amountVertices-2))
                 {
                     return null;
                 }
