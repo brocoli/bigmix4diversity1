@@ -6,28 +6,10 @@ namespace Assets.Pieces
 {
     public class Piece : MonoBehaviour
     {
-        public int MinSegments = 3;
-        public int MaxSegments = 5;
-
-        public float BaseRadius = 3.5f;
-        public float OutsetDeviation = 2f;
-        public float InsetDeviation = 2f;
-
-        // Use this for initialization
-        void Start()
+        void InitVertices(Vector2[] vertices2D)
         {
-            var vertices2D = GenerateVertices();
-
             BuildCollider(vertices2D);
             BuildMesh(vertices2D);
-        }
-
-        private Vector2[] GenerateVertices()
-        {
-            var vertices = Random.Range(MinSegments, MaxSegments + 1);
-            var partitions = PartitionCircleInterval(vertices);
-
-            return ConvertPartitionsTo2D(partitions);
         }
 
         private void BuildCollider(Vector2[] vertices2D)
@@ -62,35 +44,6 @@ namespace Assets.Pieces
 
             var filter = gameObject.AddComponent<MeshFilter>();
             filter.mesh = mesh;
-        }
-
-        private static List<float> PartitionCircleInterval(int vertices)
-        {
-            var partitions = new List<float>(vertices);
-
-            for (var i = 0; i < vertices; i++)
-            {
-                partitions.Add(Random.Range(0, 2 * Mathf.PI));
-            }
-
-            partitions.Sort();
-
-            return partitions;
-        }
-
-        private Vector2[] ConvertPartitionsTo2D(List<float> partitions)
-        {
-            var points = new List<Vector2>(partitions.Capacity);
-
-            partitions.ForEach(scalar =>
-            {
-                var deviation = Random.Range(-InsetDeviation, OutsetDeviation + Mathf.Epsilon);
-                var radius = BaseRadius + deviation;
-
-                points.Add(new Vector2(Mathf.Cos(scalar) * radius, Mathf.Sin(scalar) * radius));
-            });
-
-            return points.ToArray();
         }
     }
 }

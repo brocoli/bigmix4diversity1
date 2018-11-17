@@ -21,7 +21,7 @@ namespace Assets.Pieces
                 return indices.ToArray();
 
             int[] V = new int[n];
-            if (Area() > 0)
+            if (Area(m_points) > 0)
             {
                 for (int v = 0; v < n; v++)
                     V[v] = v;
@@ -70,14 +70,14 @@ namespace Assets.Pieces
             return indices.ToArray();
         }
 
-        private float Area()
+        public static float Area(List<Vector2> points)
         {
-            int n = m_points.Count;
+            int n = points.Count;
             float A = 0.0f;
             for (int p = n - 1, q = 0; q < n; p = q++)
             {
-                Vector2 pval = m_points[p];
-                Vector2 qval = m_points[q];
+                Vector2 pval = points[p];
+                Vector2 qval = points[q];
                 A += pval.x * qval.y - qval.x * pval.y;
             }
             return (A * 0.5f);

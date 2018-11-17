@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4222341905609132}
   - component: {fileID: 114814972187991440}
   m_Layer: 0
-  m_Name: New Prefab
+  m_Name: PieceSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -54,6 +54,12 @@ MonoBehaviour:
   PiecePrefab: {fileID: 1567295567445702, guid: de96e0e0bb383fc469906acbacdba9d3,
     type: 2}
   SpawnPoint: {fileID: 4222341905609132}
+  MinSegments: 3
+  MaxSegments: 5
+  BaseRadius: 3.5
+  OutsetDeviation: 1
+  InsetDeviation: 1
+  MinTriangleArea: 5
   Min: -4
   Max: 4
-  Limit: 3
+  Limit: 1
