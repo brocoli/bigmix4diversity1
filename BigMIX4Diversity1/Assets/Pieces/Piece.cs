@@ -60,7 +60,7 @@ namespace Assets.Pieces
             CameraRef = Camera.main;
             _cameraDelta = CameraRef.transform.position.y + 12f;
 
-            _pieceRandomizerDelta = 24f;
+            _pieceRandomizerDelta = 20f;
         }
 
         public void InitVertices(Vector2[] vertices2D)
