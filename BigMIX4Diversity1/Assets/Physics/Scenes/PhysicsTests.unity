@@ -238,7 +238,7 @@ Prefab:
     - target: {fileID: 114608762088961486, guid: 276b2ec253e29414da863d3bad88878a,
         type: 2}
       propertyPath: ZoomPeriod
-      value: 1
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 114608762088961486, guid: 276b2ec253e29414da863d3bad88878a,
         type: 2}
