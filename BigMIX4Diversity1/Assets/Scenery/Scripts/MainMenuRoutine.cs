@@ -61,6 +61,8 @@ public class MainMenuRoutine : MonoBehaviour
 
     public void StartGame()
     {
+        EffectAudioSource.PlayOneShot(EffectAudioSource.clip);
+
         CreditsButton.SetActive(false);
 
         _menuTransform.DOScale(new Vector3(100.5f, 100.5f, 1), ZoomPeriod).SetEase(Ease.InCubic).OnStart(() =>
@@ -109,6 +111,8 @@ public class MainMenuRoutine : MonoBehaviour
 
     public void ShowCredits()
     {
+        EffectAudioSource.PlayOneShot(EffectAudioSource.clip);
+
         if (MainMenu.GetComponent<CanvasGroup>().alpha > 0 && !_menuFlag)
         {
             _menuFlag = true;
@@ -146,6 +150,24 @@ public class MainMenuRoutine : MonoBehaviour
             MainAudioSource.mute = false;
             EffectAudioSource.mute = false;
             _soundFlag = false;
+        }
+    }
+
+    public void CloseGame()
+    {
+        EffectAudioSource.PlayOneShot(EffectAudioSource.clip);
+
+        if (CreditsMenu.GetComponent<CanvasGroup>().alpha > 0)
+        {
+            CreditsMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f)
+                .OnComplete(() =>
+                {
+                    MainMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f);
+                });
+        }
+        else
+        {
+            Application.Quit();
         }
     }
 }
