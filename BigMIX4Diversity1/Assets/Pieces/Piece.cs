@@ -18,7 +18,6 @@ namespace Assets.Pieces
         private PolygonCollider2D _polygonCollider2D;
         private bool _lastMouse0Up;
         private bool _isInPlay;
-        private Transform _transform;
         private float _finalY = float.NegativeInfinity;
 
         private Vector2 _mouseDownPointerPos;
@@ -37,11 +36,13 @@ namespace Assets.Pieces
 
         public void Awake()
         {
-            _transform = GetComponent<Transform>();
-            _transform.SetAsFirstSibling();
+            var p = transform.position;
+            p.z = -2f;
+            transform.position = p;
+            transform.SetAsFirstSibling();
 
-            var pos = _transform.position;
-            _transform.position = pos;
+            var pos = transform.position;
+            transform.position = pos;
 
             if (!_hasReferencePoints)
             {
@@ -143,6 +144,8 @@ namespace Assets.Pieces
 
         private void Update()
         {
+            transform.SetAsFirstSibling();
+
             if (_touchController == this)
             {
                 if (Input.GetKeyDown(KeyCode.Mouse0))
@@ -183,7 +186,7 @@ namespace Assets.Pieces
         private void OnPieceTouchDown()
         {
             var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            var piecePos = _transform.position;
+            var piecePos = transform.position;
 
             _mouseDownPointerPos = new Vector2(mousePos.x, mousePos.y);
             _mouseDownPiecePos = new Vector2(piecePos.x, piecePos.y);
@@ -195,10 +198,10 @@ namespace Assets.Pieces
             var deltaPosX = pos.x - _mouseDownPointerPos.x;
             var deltaPosY = pos.y - _mouseDownPointerPos.y;
 
-            var piecePos = _transform.position;
+            var piecePos = transform.position;
             piecePos.x = _mouseDownPiecePos.x + deltaPosX;
             piecePos.y = _mouseDownPiecePos.y + deltaPosY;
-            _transform.position = piecePos;
+            transform.position = piecePos;
         }
 
         private void OnPieceTouchUp()
@@ -215,13 +218,13 @@ namespace Assets.Pieces
 
             if (_isInPlay)
             {
-                var rawPos = _transform.position;
+                var rawPos = transform.position;
                 var nextY = rawPos.y + VelY;
 
                 if (nextY > _finalY)
                 {
                     var pos = new Vector3(rawPos.x, nextY, rawPos.z);
-                    _transform.position = pos;
+                    transform.position = pos;
                 }
             }
         }
@@ -236,6 +239,8 @@ namespace Assets.Pieces
             for (var i = 0; i < _amountReferencePoints; i++)
             {
                 var referencePoint = ReferencePoints[i];
+                RaycastHit2D[] hits = new RaycastHit2D[99];
+
                 
                 var hitFromBelow = Physics2D.Raycast(referencePoint, Vector2.up);
                 if (hitFromBelow.collider != _polygonCollider2D)
@@ -287,7 +292,7 @@ namespace Assets.Pieces
                 }
             }
             
-            _finalY = _transform.position.y - maxDeltaY;
+            _finalY = transform.position.y - maxDeltaY;
             _isInPlay = true;
         }
 
