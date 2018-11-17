@@ -9,12 +9,12 @@ namespace Assets.Pieces
         public GameObject PiecePrefab;
         public Transform SpawnPoint;
 
-        public int MinSegments = 3;
+        public int MinSegments = 4;
         public int MaxSegments = 6;
         public float BaseRadius = 3.5f;
-        public float OutsetDeviation = 1f;
-        public float InsetDeviation = 2.5f;
-        public float MinTriangleAreaPerSidesMinusTwo = 6f;
+        public float OutsetDeviation = 0f;
+        public float InsetDeviation = 0f;
+        public float MinTriangleAreaPerSidesMinusTwo = 0f;
 
         public float SpawnDistance = 5f;
 
@@ -40,7 +40,7 @@ namespace Assets.Pieces
                 }
 
                 _pieces[i] = null;
-                StartCoroutine(SpawnAfter(2, i));
+                SpawnPiece(i);
             }
         }
 
@@ -62,12 +62,6 @@ namespace Assets.Pieces
             _pieces[slot] = newPiece;
         }
 
-        private IEnumerator<WaitForSeconds> SpawnAfter(int seconds, int slot)
-        {
-            yield return new WaitForSeconds(seconds);
-            SpawnPiece(slot);
-        }
-
         private Vector2[] GenerateGoodVertices(int amountVertices)
         {
             Vector2[] vertices2D;
@@ -79,11 +73,13 @@ namespace Assets.Pieces
                 if (vertices2D == null)
                 {
                     tries += 1;
-                    if (tries > 500)
+                    if (tries <= 500)
                     {
-                        print("Warning! piece spawn constraints are too strict.");
-                        break;
+                        continue;
                     }
+
+                    Debug.Log("Warning! piece spawn constraints are too strict.");
+                    break;
                 }
                 else
                 {

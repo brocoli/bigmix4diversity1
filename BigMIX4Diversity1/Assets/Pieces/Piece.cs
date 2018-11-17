@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Debug = System.Diagnostics.Debug;
 using Random = UnityEngine.Random;
@@ -8,14 +9,31 @@ namespace Assets.Pieces
     public class Piece : MonoBehaviour
     {
         public Material[] Materials;
-        public PhysicsMaterial2D PhysicsMaterial2D;
+        public float VelY = -0.5f;
+
+        private static readonly int _amountReferencePoints = 201;
+        private static readonly Vector2[] ReferencePoints = new Vector2[_amountReferencePoints];
+        private static bool _hasReferencePoints = false;
 
         private PolygonCollider2D _polygonCollider2D;
-        private Rigidbody2D _rigidBody2D;
         private bool _lastMouse0Up;
-        private int _stillForNUpdates;
-
         private bool _isInPlay;
+        private Transform _transform;
+        private float _finalY = float.NegativeInfinity;
+
+        public void Awake()
+        {
+            _transform = GetComponent<Transform>();
+
+            if (!_hasReferencePoints)
+            {
+                for (var i = 0; i < _amountReferencePoints; i++)
+                {
+                    ReferencePoints[i] = new Vector2((float)(i - (_amountReferencePoints - 1)/2) /2, -12f);
+                }
+                _hasReferencePoints = true;
+            }
+        }
 
         public void InitVertices(Vector2[] vertices2D)
         {
@@ -53,7 +71,7 @@ namespace Assets.Pieces
             var meshRenderer = gameObject.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
             Debug.Assert(meshRenderer != null, nameof(meshRenderer) + " != null");
             
-            meshRenderer.material = Materials[Random.Range(0,Materials.Length)];
+            meshRenderer.material = Materials[Random.Range(0, Materials.Length)];
 
             var filter = gameObject.AddComponent<MeshFilter>();
             filter.mesh = mesh;
@@ -83,7 +101,7 @@ namespace Assets.Pieces
             var deltaY = maxY - minY;
             var midY = (maxY + minY)/2;
 
-            var delta = Mathf.Max(deltaX, deltaY);
+            var delta = Mathf.Max(deltaX, deltaY) + 0.1f;
 
             var uv = new Vector2[amountVertices];
             for (var i = 0; i < amountVertices; i++)
@@ -102,7 +120,7 @@ namespace Assets.Pieces
 
         private void FixedUpdate()
         {
-            if (_lastMouse0Up)
+            if (_lastMouse0Up && !_isInPlay)
             {
                 _lastMouse0Up = false;
 
@@ -111,58 +129,78 @@ namespace Assets.Pieces
 
                 if (hit.collider != null && hit.collider == _polygonCollider2D)
                 {
-                    _stillForNUpdates = 0;
                     PutIntoPlay();
-                    SetDynamic();
                 }
             }
 
-            if (_rigidBody2D != null && _rigidBody2D.velocity.magnitude <= Mathf.Epsilon)
+            if (_isInPlay)
             {
-                _stillForNUpdates += 1;
-                if (_stillForNUpdates > 4)
+                var rawPos = _transform.position;
+                var nextY = rawPos.y + VelY;
+
+                if (nextY > _finalY)
                 {
-                    SetStatic();
+                    var pos = new Vector3(rawPos.x, nextY, rawPos.z);
+                    _transform.position = pos;
                 }
-            }
-            else
-            {
-                _stillForNUpdates = 0;
             }
         }
 
         private void PutIntoPlay()
         {
+            var affectedReferencePoints = new List<int>();
+            var hitsFromAbove = new List<float>();
+
+            var maxDeltaY = float.NegativeInfinity;
+            
+            for (var i = 0; i < _amountReferencePoints; i++)
+            {
+                var referencePoint = ReferencePoints[i];
+                
+                var hitFromBelow = Physics2D.Raycast(referencePoint, Vector2.up);
+                if (hitFromBelow.collider != _polygonCollider2D)
+                {
+                    continue;
+                }
+
+                var hitFromAbove = Physics2D.Raycast(new Vector2(referencePoint.x, 100f), Vector2.down);
+                Debug.Assert(hitFromAbove.collider != null, "wtf is this? I can hit from below but not above?");
+
+                affectedReferencePoints.Add(i);
+                hitsFromAbove.Add(hitFromAbove.point.y);
+
+                var hitY = hitFromBelow.point.y;
+                var deltaY = hitY - referencePoint.y;
+                if (maxDeltaY < deltaY)
+                {
+                    maxDeltaY = deltaY;
+                }
+            }
+
+            Debug.Assert(!float.IsNegativeInfinity(maxDeltaY));
+            
+            var amountAffectedPoints = affectedReferencePoints.Count;
+            for (var i = 0; i < amountAffectedPoints; i++)
+            {
+                var j = affectedReferencePoints[i];
+                var referencePoint = ReferencePoints[j];
+                var hitFromAbove = hitsFromAbove[i];
+
+                var landedReferencePoint = hitFromAbove - maxDeltaY;
+                if (landedReferencePoint >= referencePoint.y)
+                {
+                    referencePoint.y = landedReferencePoint + 1f;
+                    ReferencePoints[j] = referencePoint;
+                }
+            }
+            
+            _finalY = _transform.position.y - maxDeltaY;
             _isInPlay = true;
         }
 
         public bool IsInPlay()
         {
             return _isInPlay;
-        }
-
-        private void SetDynamic()
-        {
-            if (_rigidBody2D != null)
-            {
-                return;
-            }
-
-            _rigidBody2D = gameObject.AddComponent(typeof(Rigidbody2D)) as Rigidbody2D;
-            Debug.Assert(_rigidBody2D != null, nameof(_rigidBody2D) + " != null");
-
-            _rigidBody2D.sharedMaterial = PhysicsMaterial2D;
-        }
-
-        private void SetStatic()
-        {
-            if (_rigidBody2D == null)
-            {
-                return;
-            }
-
-            Destroy(_rigidBody2D);
-            _rigidBody2D = null;
         }
     }
 }

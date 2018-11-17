@@ -54,12 +54,10 @@ MonoBehaviour:
   PiecePrefab: {fileID: 1567295567445702, guid: de96e0e0bb383fc469906acbacdba9d3,
     type: 2}
   SpawnPoint: {fileID: 4222341905609132}
-  MinSegments: 3
+  MinSegments: 4
   MaxSegments: 6
   BaseRadius: 3.5
-  OutsetDeviation: 1
-  InsetDeviation: 2.5
-  MinTriangleAreaPerSidesMinusTwo: 5
-  MinSpawnX: 0
-  MaxSpawnX: 0
-  SpawnPeriod: 0
+  OutsetDeviation: 0
+  InsetDeviation: 0
+  MinTriangleAreaPerSidesMinusTwo: 0
+  SpawnDistance: 5
