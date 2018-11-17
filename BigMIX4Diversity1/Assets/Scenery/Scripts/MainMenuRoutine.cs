@@ -8,7 +8,7 @@ public class MainMenuRoutine : MonoBehaviour
 {
     [Header("Sprites")]
     public Texture BackgroundNoLight;
-    public Texture BackgroundWithLight;
+    public Sprite BackgroundWithLight;
     public Sprite SoundOn;
     public Sprite SoundOff;
 
@@ -20,6 +20,7 @@ public class MainMenuRoutine : MonoBehaviour
     public GameObject Logo;
     public GameObject SoundButton;
     public GameObject CreditsButton;
+    public GameObject Spawner;
 
     [Header("Introduction Texts")]
     public Text IntroText1;
@@ -28,21 +29,21 @@ public class MainMenuRoutine : MonoBehaviour
 
     [Header("Variables")]
     public int ZoomPeriod;
+    public float TextFadeTime = 1f;
+    public float TextTime = 4f;
+    public float ExtraDelay = 3f;
 
     [Header("AudioSources")]
     public AudioSource MainAudioSource;
     public AudioSource EffectAudioSource;
 
     private RectTransform _menuTransform;
-    private RectTransform _bgTransform;
+    private Transform _bgTransform;
 
-    private RawImage _bgImage;
+    private SpriteRenderer _bgImage;
     private RawImage _logoImage;
 
     private Animator _lightAnimator;
-
-    private float _textFadeTime = 1f;
-    private float _textTime = 4f;
 
     private bool _menuFlag;
     private bool _soundFlag;
@@ -52,7 +53,7 @@ public class MainMenuRoutine : MonoBehaviour
         _bgTransform = Background.GetComponent<RectTransform>();
         _menuTransform = MainMenu.GetComponent<RectTransform>();
 
-        _bgImage = Background.GetComponent<RawImage>();
+        _bgImage = Background.GetComponent<SpriteRenderer>();
         _logoImage = Logo.GetComponent<RawImage>();
 
         _lightAnimator = LightBeam.GetComponent<Animator>();
@@ -64,28 +65,30 @@ public class MainMenuRoutine : MonoBehaviour
 
         _menuTransform.DOScale(new Vector3(100.5f, 100.5f, 1), ZoomPeriod).SetEase(Ease.InCubic).OnStart(() =>
         {
-            _bgTransform.DOScale(new Vector3(1.5f, 1.5f, 1), ZoomPeriod + 10f).SetEase(Ease.InCubic);
+            _bgTransform.DOScale(new Vector3(4f, 4f, 1), ZoomPeriod + 10f).SetEase(Ease.InCubic);
 
             _logoImage.DOColor(Color.clear, (float) ZoomPeriod / 2).SetDelay((float) ZoomPeriod / 2)
                 .OnComplete(() =>
                 {
-                    IntroText1.DOFade(1, _textFadeTime).OnComplete(() =>
+                    IntroText1.DOFade(1, TextFadeTime).OnComplete(() =>
                     {
-                        IntroText1.DOFade(0, _textFadeTime).SetDelay(_textTime)
+                        IntroText1.DOFade(0, TextFadeTime).SetDelay(TextTime)
                             .OnComplete(() =>
                             {
-                                IntroText2.DOFade(1, _textFadeTime).OnComplete(() =>
+                                IntroText2.DOFade(1, TextFadeTime).OnComplete(() =>
                                 {
-                                    IntroText2.DOFade(0, _textFadeTime).SetDelay(_textTime)
+                                    IntroText2.DOFade(0, TextFadeTime).SetDelay(TextTime)
                                         .OnComplete(() =>
                                         {
-                                            IntroText3.DOFade(1, _textFadeTime + 3f).OnComplete(() =>
+                                            IntroText3.DOFade(1, TextFadeTime + ExtraDelay).OnComplete(() =>
                                             {
-                                                IntroText3.DOFade(0, _textFadeTime + 3f).SetDelay(_textTime)
+                                                IntroText3.DOFade(0, TextFadeTime + ExtraDelay).SetDelay(TextTime)
                                                     .OnComplete(() =>
                                                     {
                                                         LightBeam.SetActive(true);
-                                                        StartCoroutine(DelayChange());
+                                                        Spawner.SetActive(true);
+
+                                                        //StartCoroutine(DelayChange());
                                                     });
                                             });
                                         });
@@ -99,8 +102,9 @@ public class MainMenuRoutine : MonoBehaviour
     public IEnumerator DelayChange()
     {
         yield return new WaitForSeconds(_lightAnimator.GetCurrentAnimatorClipInfo(0).Length + 3);
-        _bgImage.texture = BackgroundWithLight;
+        _bgImage.sprite = BackgroundWithLight;
         LightBeam.SetActive(false);
+        Spawner.SetActive(true);
     }
 
     public void ShowCredits()
