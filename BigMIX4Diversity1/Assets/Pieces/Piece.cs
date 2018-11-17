@@ -24,6 +24,9 @@ namespace Assets.Pieces
         private Vector2 _mouseDownPointerPos;
         private Vector2 _mouseDownPiecePos;
 
+        private static Piece _touchFocus;
+        private static Piece _touchController;
+
         public void Awake()
         {
             _transform = GetComponent<Transform>();
@@ -39,6 +42,11 @@ namespace Assets.Pieces
                     ReferencePoints[i] = new Vector2((float)(i - (_amountReferencePoints - 1)/2) /2, -12f);
                 }
                 _hasReferencePoints = true;
+            }
+
+            if (_touchController == null)
+            {
+                _touchController = this;
             }
         }
 
@@ -122,48 +130,74 @@ namespace Assets.Pieces
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Mouse0))
+            if (_touchController == this)
             {
-                var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                var piecePos = _transform.position;
+                if (Input.GetKeyDown(KeyCode.Mouse0))
+                {
+                    var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    var hit = Physics2D.Raycast(pos, Vector2.zero);
 
-                _mouseDownPointerPos = new Vector2(mousePos.x, mousePos.y);
-                _mouseDownPiecePos = new Vector2(piecePos.x, piecePos.y);
+                    if (hit.collider != null)
+                    {
+                        var piece = hit.collider.gameObject.GetComponent<Piece>();
+                        if (piece != null)
+                        {
+                            _touchFocus = piece;
+                            _touchFocus.OnPieceTouchDown();
+                        }
+                    }
+                }
+
+                if (Input.GetKey(KeyCode.Mouse0))
+                {
+                    if (_touchFocus)
+                    {
+                        _touchFocus.OnPieceTouch();
+                    }
+                }
+
+                if (Input.GetKeyUp(KeyCode.Mouse0))
+                {
+                    if (_touchFocus)
+                    {
+                        _touchFocus.OnPieceTouchUp();
+                    }
+                    _touchFocus = null;
+                }
             }
+        }
 
+        private void OnPieceTouchDown()
+        {
+            var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            var piecePos = _transform.position;
+
+            _mouseDownPointerPos = new Vector2(mousePos.x, mousePos.y);
+            _mouseDownPiecePos = new Vector2(piecePos.x, piecePos.y);
+        }
+
+        private void OnPieceTouch()
+        {
+            var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            var deltaPosX = pos.x - _mouseDownPointerPos.x;
+            var deltaPosY = pos.y - _mouseDownPointerPos.y;
+
+            var piecePos = _transform.position;
+            piecePos.x = _mouseDownPiecePos.x + deltaPosX;
+            piecePos.y = _mouseDownPiecePos.y + deltaPosY;
+            _transform.position = piecePos;
+        }
+
+        private void OnPieceTouchUp()
+        {
             _lastMouse0Up = Input.GetKeyUp(KeyCode.Mouse0);
         }
 
         private void FixedUpdate()
         {
-            if (Input.GetKey(KeyCode.Mouse0))
-            {
-                var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                var hit = Physics2D.Raycast(pos, Vector2.zero);
-
-                if (hit.collider != null && hit.collider == _polygonCollider2D)
-                {
-                    var deltaPosX = pos.x - _mouseDownPointerPos.x;
-                    var deltaPosY = pos.y - _mouseDownPointerPos.y;
-
-                    var piecePos = _transform.position;
-                    piecePos.x = _mouseDownPiecePos.x + deltaPosX;
-                    piecePos.y = _mouseDownPiecePos.y + deltaPosY;
-                    _transform.position = piecePos;
-                }
-            }
-
             if (_lastMouse0Up && !_isInPlay)
             {
-                _lastMouse0Up = false;
-
-                var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                var hit = Physics2D.Raycast(pos, Vector2.zero);
-
-                if (hit.collider != null && hit.collider == _polygonCollider2D)
-                {
-                    PutIntoPlay();
-                }
+                PutIntoPlay();
             }
 
             if (_isInPlay)
