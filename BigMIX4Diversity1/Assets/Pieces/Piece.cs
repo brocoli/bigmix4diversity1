@@ -25,7 +25,8 @@ namespace Assets.Pieces
         private static float _maxReferenceY = -12f;
 
         public PieceRandomizer PieceRandomizer;
-        public Camera CameraRef;
+
+        private float _minCameraY;
 
         public void Awake()
         {
@@ -36,12 +37,11 @@ namespace Assets.Pieces
 
             var pos = transform.position;
             transform.position = pos;
-
-            CameraRef = Camera.main;
         }
 
         public void Start()
         {
+            _minCameraY = Camera.main.transform.position.y;
             _yReferences = GameObject.FindWithTag("YReferences");
         }
 
@@ -208,6 +208,7 @@ namespace Assets.Pieces
             var amountAffectedPoints = affectedReferencePoints.Count;
 
             var meanRefPointMoveUp = 0f;
+
             for (var i = 0; i < amountAffectedPoints; i++)
             {
                 var j = affectedReferencePoints[i];
@@ -238,19 +239,29 @@ namespace Assets.Pieces
 
                 var landedReferencePoint = hitFromAbove - amountMoveDown;
 
-                referencePoint.y = landedReferencePoint;
-                referencesTransforms[j].position = referencePoint;
+                if (referencePoint.y < landedReferencePoint)
+                {
+                    referencePoint.y = landedReferencePoint;
+                    referencesTransforms[j].position = referencePoint;
+                }
 
                 if (_maxReferenceY < referencePoint.y)
                 {
                     _maxReferenceY = referencePoint.y;
 
-                    var cameraTransform = CameraRef.transform;
-                    var targetY = _maxReferenceY + PieceRandomizer.WindowHeight * 1/4;
+                    var windowHeight = PieceRandomizer.WindowHeight;
+                    var cameraTransform = Camera.main.transform;
+                    var targetY = _maxReferenceY + windowHeight * 1/4;
+
+                    targetY = Mathf.Max(targetY, _minCameraY);
+
+                    var maxCameraY = GameObject.FindWithTag("Background").GetComponent<SpriteRenderer>().bounds.max.y - windowHeight;
+                    targetY = Mathf.Min(targetY, maxCameraY);
+
                     cameraTransform.DOMoveY(targetY, 0.4f);
 
                     var spawnerPos = PieceRandomizer.transform.position;
-                    spawnerPos.y = targetY + PieceRandomizer.WindowHeight * 3/4;
+                    spawnerPos.y = targetY + windowHeight * 3/4;
                     PieceRandomizer.transform.position = spawnerPos;
                 }
             }
