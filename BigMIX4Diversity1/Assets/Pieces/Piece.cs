@@ -201,7 +201,7 @@ namespace Assets.Pieces
 
             if (float.IsNegativeInfinity(maxDeltaY))
             {
-                Destroy(this);
+                Destroy(gameObject);
                 return;
             }
             
