@@ -223,9 +223,10 @@ namespace Assets.Pieces
             meanRefPointMoveUp /= amountAffectedPoints;
 
             var amountMoveDown = maxDeltaY;
-            if (meanRefPointMoveUp < MinMeanMoveUpPerPlay)
+            var minMoveUpThisPlay = MinMeanMoveUpPerPlay / amountAffectedPoints;
+            if (meanRefPointMoveUp < minMoveUpThisPlay)
             {
-                amountMoveDown -= MinMeanMoveUpPerPlay - meanRefPointMoveUp;
+                amountMoveDown -= minMoveUpThisPlay - meanRefPointMoveUp;
             }
 
             for (var i = 0; i < amountAffectedPoints; i++)
@@ -245,11 +246,11 @@ namespace Assets.Pieces
                     _maxReferenceY = referencePoint.y;
 
                     var cameraTransform = CameraRef.transform;
-                    var targetY = _maxReferenceY;
+                    var targetY = _maxReferenceY + PieceRandomizer.WindowHeight * 1/4;
                     cameraTransform.DOMoveY(targetY, 0.4f);
 
                     var spawnerPos = PieceRandomizer.transform.position;
-                    spawnerPos.y = targetY + PieceRandomizer.WindowHeight / 2;
+                    spawnerPos.y = targetY + PieceRandomizer.WindowHeight * 3/4;
                     PieceRandomizer.transform.position = spawnerPos;
                 }
             }
