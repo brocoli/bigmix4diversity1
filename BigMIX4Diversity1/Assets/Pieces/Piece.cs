@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using UnityEngine;
 using Debug = System.Diagnostics.Debug;
@@ -10,30 +11,21 @@ namespace Assets.Pieces
     public class Piece : MonoBehaviour
     {
         public Material[] Materials;
-        public float VelY = -0.5f;
+        public float TransitionDownTime = 1f;
+        public float MinMeanMoveUpPerPlay = 10f;
 
-        private static readonly int _amountReferencePoints = 101;
-        private static readonly Vector2[] ReferencePoints = new Vector2[_amountReferencePoints];
-        private static bool _hasReferencePoints = false;
+        private GameObject _yReferences;
 
         private PolygonCollider2D _polygonCollider2D;
-        private bool _lastMouse0Up;
         private bool _isInPlay;
-        private float _finalY = float.NegativeInfinity;
 
         private Vector2 _mouseDownPointerPos;
         private Vector2 _mouseDownPiecePos;
 
-        private static Piece _touchFocus;
-        private static Piece _touchController;
-
         private static float _maxReferenceY = -12f;
 
         public PieceRandomizer PieceRandomizer;
-        private static float _pieceRandomizerDelta;
-
         public Camera CameraRef;
-        private static float _cameraDelta;
 
         public void Awake()
         {
@@ -45,24 +37,12 @@ namespace Assets.Pieces
             var pos = transform.position;
             transform.position = pos;
 
-            if (!_hasReferencePoints)
-            {
-                for (var i = 0; i < _amountReferencePoints; i++)
-                {
-                    ReferencePoints[i] = new Vector2((float)(i - (_amountReferencePoints - 1)/2), -12f);
-                }
-                _hasReferencePoints = true;
-            }
-
-            if (_touchController == null)
-            {
-                _touchController = this;
-            }
-
             CameraRef = Camera.main;
-            _cameraDelta = CameraRef.transform.position.y + 12f;
+        }
 
-            _pieceRandomizerDelta = 24f;
+        public void Start()
+        {
+            _yReferences = GameObject.FindWithTag("YReferences");
         }
 
         public void InitVertices(Vector2[] vertices2D)
@@ -143,47 +123,13 @@ namespace Assets.Pieces
             return uv;
         }
 
-        private void Update()
+        public void OnPieceTouchDown()
         {
-            if (_touchController == this)
+            if (_isInPlay)
             {
-                if (Input.GetKeyDown(KeyCode.Mouse0))
-                {
-                    var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    var hit = Physics2D.Raycast(pos, Vector2.zero);
-
-                    if (hit.collider != null)
-                    {
-                        var piece = hit.collider.gameObject.GetComponent<Piece>();
-                        if (piece != null && !piece._isInPlay)
-                        {
-                            _touchFocus = piece;
-                            _touchFocus.OnPieceTouchDown();
-                        }
-                    }
-                }
-
-                if (Input.GetKey(KeyCode.Mouse0))
-                {
-                    if (_touchFocus)
-                    {
-                        _touchFocus.OnPieceTouch();
-                    }
-                }
-
-                if (Input.GetKeyUp(KeyCode.Mouse0))
-                {
-                    if (_touchFocus)
-                    {
-                        _touchFocus.OnPieceTouchUp();
-                    }
-                    _touchFocus = null;
-                }
+                return;
             }
-        }
 
-        private void OnPieceTouchDown()
-        {
             var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             var piecePos = transform.position;
 
@@ -191,8 +137,13 @@ namespace Assets.Pieces
             _mouseDownPiecePos = new Vector2(piecePos.x, piecePos.y);
         }
 
-        private void OnPieceTouch()
+        public void OnPieceTouch()
         {
+            if (_isInPlay)
+            {
+                return;
+            }
+
             var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             var deltaPosX = pos.x - _mouseDownPointerPos.x;
             var deltaPosY = pos.y - _mouseDownPointerPos.y;
@@ -203,94 +154,107 @@ namespace Assets.Pieces
             transform.position = piecePos;
         }
 
-        private void OnPieceTouchUp()
+        public void OnPieceTouchUp()
         {
-            _lastMouse0Up = Input.GetKeyUp(KeyCode.Mouse0);
-        }
-
-        private void FixedUpdate()
-        {
-            if (_lastMouse0Up && !_isInPlay)
-            {
-                PutIntoPlay();
-            }
-
             if (_isInPlay)
             {
-                var rawPos = transform.position;
-                var nextY = rawPos.y + VelY;
-
-                if (nextY > _finalY)
-                {
-                    var pos = new Vector3(rawPos.x, nextY, rawPos.z);
-                    transform.position = pos;
-                }
+                return;
             }
+
+
+            PutIntoPlay();
         }
 
         private void PutIntoPlay()
         {
+            var referencesTransforms = _yReferences.transform.Cast<Transform>().ToArray();
+            var amountReferencePoints = referencesTransforms.Length;
+            
             var affectedReferencePoints = new List<int>();
             var hitsFromAbove = new List<float>();
 
             var maxDeltaY = float.NegativeInfinity;
             
-            for (var i = 0; i < _amountReferencePoints; i++)
+            for (var i = 0; i < amountReferencePoints; i++)
             {
-                var referencePoint = ReferencePoints[i];
-                RaycastHit2D[] hits = new RaycastHit2D[99];
+                var referencePoint = referencesTransforms[i].position;
 
-                
                 var hitFromBelow = Physics2D.Raycast(new Vector2(referencePoint.x, _polygonCollider2D.bounds.min.y - float.Epsilon), Vector2.up);
                 if (hitFromBelow.collider != _polygonCollider2D)
                 {
                     continue;
                 }
 
-                var hitY = hitFromBelow.point.y;
+                var hitFromBelowY = hitFromBelow.point.y;
                 var hitFromAbove = Physics2D.Raycast(new Vector2(referencePoint.x, _polygonCollider2D.bounds.max.y + float.Epsilon), Vector2.down);
                 Debug.Assert(hitFromAbove.collider != null, "wtf is this? I can hit from below but not above?");
 
                 affectedReferencePoints.Add(i);
                 hitsFromAbove.Add(hitFromAbove.point.y);
 
-                var deltaY = hitY - referencePoint.y;
+                var deltaY = hitFromBelowY - referencePoint.y;
                 if (maxDeltaY < deltaY)
                 {
                     maxDeltaY = deltaY;
                 }
             }
 
-            Debug.Assert(!float.IsNegativeInfinity(maxDeltaY));
+            if (float.IsNegativeInfinity(maxDeltaY))
+            {
+                Destroy(this);
+                return;
+            }
             
             var amountAffectedPoints = affectedReferencePoints.Count;
+
+            var meanRefPointMoveUp = 0f;
             for (var i = 0; i < amountAffectedPoints; i++)
             {
                 var j = affectedReferencePoints[i];
-                var referencePoint = ReferencePoints[j];
+                var referenceTransform = referencesTransforms[j];
+                var referencePoint = referenceTransform.position;
                 var hitFromAbove = hitsFromAbove[i];
 
                 var landedReferencePoint = hitFromAbove - maxDeltaY;
-                if (landedReferencePoint >= referencePoint.y)
+                var referencePointMoveUp = landedReferencePoint - referencePoint.y;
+
+                meanRefPointMoveUp += referencePointMoveUp;
+            }
+            meanRefPointMoveUp /= amountAffectedPoints;
+
+            var amountMoveDown = maxDeltaY;
+            if (meanRefPointMoveUp < MinMeanMoveUpPerPlay)
+            {
+                amountMoveDown -= MinMeanMoveUpPerPlay - meanRefPointMoveUp;
+            }
+
+            for (var i = 0; i < amountAffectedPoints; i++)
+            {
+                var j = affectedReferencePoints[i];
+                var referenceTransform = referencesTransforms[j];
+                var referencePoint = referenceTransform.position;
+                var hitFromAbove = hitsFromAbove[i];
+
+                var landedReferencePoint = hitFromAbove - amountMoveDown;
+
+                referencePoint.y = landedReferencePoint;
+                referencesTransforms[j].position = referencePoint;
+
+                if (_maxReferenceY < referencePoint.y)
                 {
-                    referencePoint.y = landedReferencePoint + 0.5f;
-                    ReferencePoints[j] = referencePoint;
+                    _maxReferenceY = referencePoint.y;
 
-                    if (referencePoint.y > _maxReferenceY)
-                    {
-                        _maxReferenceY = referencePoint.y;
+                    var cameraTransform = CameraRef.transform;
+                    var targetY = _maxReferenceY;
+                    cameraTransform.DOMoveY(targetY, 0.4f);
 
-                        var cameraTransform = CameraRef.transform;
-                        cameraTransform.DOMoveY((_cameraDelta + _maxReferenceY) / 2.8f, 0.3f);
-
-                        var spawnerPos = PieceRandomizer.transform.position;
-                        spawnerPos.y = (_pieceRandomizerDelta + _maxReferenceY) / 1.6f;
-                        PieceRandomizer.transform.position = spawnerPos;
-                    }
+                    var spawnerPos = PieceRandomizer.transform.position;
+                    spawnerPos.y = targetY + PieceRandomizer.WindowHeight / 2;
+                    PieceRandomizer.transform.position = spawnerPos;
                 }
             }
-            
-            _finalY = transform.position.y - maxDeltaY;
+
+            transform.DOMoveY(transform.position.y - amountMoveDown, TransitionDownTime);
             _isInPlay = true;
         }
 

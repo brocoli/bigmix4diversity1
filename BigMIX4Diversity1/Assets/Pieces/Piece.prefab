@@ -60,4 +60,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: cadb58b1478f10247981495d2caf282d, type: 2}
   - {fileID: 2100000, guid: 60b19cb2dd1270a4d82ecc5626ac5b44, type: 2}
   - {fileID: 2100000, guid: c95ac051a06f13e4fbea780a95e5ec0a, type: 2}
-  VelY: -0.5
+  TransitionDownTime: 1
+  MinMeanMoveUpPerPlay: 3
+  PieceRandomizer: {fileID: 0}
+  CameraRef: {fileID: 0}

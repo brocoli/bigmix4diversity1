@@ -14,14 +14,20 @@ namespace Assets.Pieces
         public float BaseRadius = 3.5f;
         public float OutsetDeviation = 0f;
         public float InsetDeviation = 0f;
+
+        public float MinWidth = 0f;
+        public float MinHeight = 0f;
         public float MinTriangleAreaPerSidesMinusTwo = 0f;
 
         public float SpawnDistance = 5f;
 
         private readonly Piece[] _pieces = new Piece[3];
+        public float WindowHeight;
 
         public void Start()
         {
+            WindowHeight = Camera.main.ScreenToWorldPoint(new Vector3(0, Screen.height, 0)).y;
+
             for (var i = 0; i < 3; i++)
             {
                 SpawnPiece(i);
@@ -84,6 +90,38 @@ namespace Assets.Pieces
                 }
                 else
                 {
+                    var minX = float.PositiveInfinity;
+                    var maxX = float.NegativeInfinity;
+                    var minY = float.PositiveInfinity;
+                    var maxY = float.NegativeInfinity;
+
+                    foreach (var vertex in vertices2D)
+                    {
+                        if (minX > vertex.x)
+                            minX = vertex.x;
+                        if (maxX < vertex.x)
+                            maxX = vertex.x;
+                        if (minY > vertex.y)
+                            minY = vertex.y;
+                        if (maxY < vertex.y)
+                            maxY = vertex.y;
+                    }
+
+                    var deltaX = maxX - minX;
+                    var deltaY = maxY - minY;
+
+                    if (deltaX < MinWidth || deltaY < MinHeight)
+                    {
+                        tries += 1;
+                        if (tries <= 500)
+                        {
+                            continue;
+                        }
+
+                        Debug.Log("Warning! piece spawn constraints are too strict.");
+                        break;
+                    }
+
                     break; 
                 }
             }
