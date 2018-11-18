@@ -129,7 +129,6 @@ namespace Assets.Pieces
             return vertices2D;
         }
 
-
         [CanBeNull]
         private Vector2[] TryGenerateGoodVertices(int amountVertices)
         {

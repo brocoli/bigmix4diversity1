@@ -27,6 +27,7 @@ namespace Assets.Pieces
         public PieceRandomizer PieceRandomizer;
 
         private float _minCameraY;
+        private float _maxCameraY;
 
         public void Awake()
         {
@@ -41,7 +42,11 @@ namespace Assets.Pieces
 
         public void Start()
         {
+            var windowHeight = PieceRandomizer.WindowHeight;
+
             _minCameraY = Camera.main.transform.position.y;
+            _maxCameraY = GameObject.FindWithTag("Background").GetComponent<SpriteRenderer>().bounds.max.y - windowHeight;
+
             _yReferences = GameObject.FindWithTag("YReferences");
         }
 
@@ -254,9 +259,7 @@ namespace Assets.Pieces
                     var targetY = _maxReferenceY + windowHeight * 1/4;
 
                     targetY = Mathf.Max(targetY, _minCameraY);
-
-                    var maxCameraY = GameObject.FindWithTag("Background").GetComponent<SpriteRenderer>().bounds.max.y - windowHeight;
-                    targetY = Mathf.Min(targetY, maxCameraY);
+                    targetY = Mathf.Min(targetY, _maxCameraY);
 
                     cameraTransform.DOMoveY(targetY, 0.4f);
 

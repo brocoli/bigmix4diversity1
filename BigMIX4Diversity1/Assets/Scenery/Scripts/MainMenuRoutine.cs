@@ -88,9 +88,7 @@ public class MainMenuRoutine : MonoBehaviour
                                                     .OnComplete(() =>
                                                     {
                                                         LightBeam.SetActive(true);
-                                                        Spawner.SetActive(true);
-
-                                                        //StartCoroutine(DelayChange());
+                                                        StartCoroutine(DelayChange());
                                                     });
                                             });
                                         });
