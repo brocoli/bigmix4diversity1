@@ -24,6 +24,8 @@ namespace Assets.Pieces
 
         public PieceRandomizer PieceRandomizer;
 
+        private AudioSource _audioSource;
+
         private float _minCameraY;
         private float _maxCameraY;
 
@@ -35,6 +37,8 @@ namespace Assets.Pieces
             _maxCameraY = GameObject.FindWithTag("Background").GetComponent<SpriteRenderer>().bounds.max.y - windowHeight;
 
             _yReferences = GameObject.FindWithTag("YReferences");
+
+            _audioSource = GetComponent<AudioSource>();
         }
 
         public void InitVertices(Vector2[] vertices2D)
@@ -179,6 +183,11 @@ namespace Assets.Pieces
 
         private void PutIntoPlay()
         {
+            if (IsInPlay)
+            {
+                return;
+            }
+
             var referencesTransforms = _yReferences.transform.Cast<Transform>().ToArray();
             var amountReferencePoints = referencesTransforms.Length;
             
@@ -281,7 +290,10 @@ namespace Assets.Pieces
                 }
             }
 
-            transform.DOMoveY(transform.position.y - amountMoveDown, TransitionDownTime);
+            transform.DOMoveY(transform.position.y - amountMoveDown, TransitionDownTime).OnComplete(() =>
+            {
+                _audioSource.PlayOneShot(_audioSource.clip);
+            });
             IsInPlay = true;
             PolygonCollider2D.enabled = false;
         }

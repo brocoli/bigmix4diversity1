@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using Assets.Pieces;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
