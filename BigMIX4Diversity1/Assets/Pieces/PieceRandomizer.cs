@@ -24,6 +24,8 @@ namespace Assets.Pieces
         public readonly Piece[] PiecesToSelect = new Piece[3];
         public float WindowHeight;
 
+        public float MaxReferenceY = -15f;
+
         public void Start()
         {
             WindowHeight = Camera.main.ScreenToWorldPoint(new Vector3(0, Screen.height, 0)).y;

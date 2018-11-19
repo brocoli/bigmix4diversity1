@@ -61,7 +61,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 60b19cb2dd1270a4d82ecc5626ac5b44, type: 2}
   - {fileID: 2100000, guid: c95ac051a06f13e4fbea780a95e5ec0a, type: 2}
   TransitionDownTime: 1
-  MinMeanMoveUpPerPlay: 10
+  MinMeanMoveUpPerPlay: 4
   PolygonCollider2D: {fileID: 0}
   IsInPlay: 0
   PieceRandomizer: {fileID: 0}

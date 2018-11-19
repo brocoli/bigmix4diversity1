@@ -22,8 +22,6 @@ namespace Assets.Pieces
         private Vector2 _mouseDownPointerPos;
         private Vector2 _mouseDownPiecePos;
 
-        private static float _maxReferenceY = -12f;
-
         public PieceRandomizer PieceRandomizer;
 
         private float _minCameraY;
@@ -259,13 +257,13 @@ namespace Assets.Pieces
                     referencesTransforms[j].position = referencePoint;
                 }
 
-                if (_maxReferenceY < referencePoint.y)
+                if (PieceRandomizer.MaxReferenceY < referencePoint.y)
                 {
-                    _maxReferenceY = referencePoint.y;
+                    PieceRandomizer.MaxReferenceY = referencePoint.y;
 
                     var windowHeight = PieceRandomizer.WindowHeight;
                     var cameraTransform = Camera.main.transform;
-                    var targetY = _maxReferenceY + windowHeight * 1/4;
+                    var targetY = PieceRandomizer.MaxReferenceY + windowHeight * 1/4;
 
                     targetY = Mathf.Max(targetY, _minCameraY);
                     targetY = Mathf.Min(targetY, _maxCameraY);
