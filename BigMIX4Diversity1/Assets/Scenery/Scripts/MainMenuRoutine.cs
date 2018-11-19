@@ -23,6 +23,7 @@ public class MainMenuRoutine : MonoBehaviour
     public GameObject SoundButton;
     public GameObject CreditsButton;
     public GameObject Spawner;
+    public GameObject GameOver;
 
     [Header("Introduction Texts")]
     public Text IntroText1;
@@ -44,8 +45,9 @@ public class MainMenuRoutine : MonoBehaviour
 
     private SpriteRenderer _bgImage;
     private RawImage _logoImage;
-
     private Animator _lightAnimator;
+
+    private RawImage _gameOverImage;
 
     private bool _menuFlag;
     private bool _soundFlag;
@@ -59,6 +61,8 @@ public class MainMenuRoutine : MonoBehaviour
         _logoImage = Logo.GetComponent<RawImage>();
 
         _lightAnimator = LightBeam.GetComponent<Animator>();
+
+        _gameOverImage = GameOver.GetComponent<RawImage>();
     }
 
     public void StartGame()
@@ -114,23 +118,41 @@ public class MainMenuRoutine : MonoBehaviour
         LightBeam.SetActive(true);
         yield return new WaitForSeconds(_lightAnimator.GetCurrentAnimatorClipInfo(0).Length + 1);
 
+        var fadeImage = FadeToWhite.GetComponent<Image>();
+        fadeImage.color = new UnityEngine.Color(1.0f, 1.0f, 1.0f, 0.0f);
+
         FadeToWhite.SetActive(true);
-        FadeToWhite.GetComponent<Image>().DOColor(Color.white, 1f).SetEase(Ease.InQuad);
-        yield return new WaitForSeconds(3f + float.Epsilon);
+        fadeImage.DOFade(1f, 1f).SetEase(Ease.InQuad);
+        yield return new WaitForSeconds(1f + float.Epsilon);
 
         yield return ResetAllThings();
 
         CreditsButton.SetActive(true);
         ShowCredits();
 
-        FadeToWhite.GetComponent<Image>().DOColor(Color.clear, 1.5f);
+        fadeImage.DOFade(0f, 1.5f);
         yield return new WaitForSeconds(1.5f + float.Epsilon);
 
         yield return new WaitForSeconds(2f);
     }
 
-    public void LoseGame()
+    public IEnumerator LoseGame()
     {
+        var fadeImage = FadeToWhite.GetComponent<Image>();
+        fadeImage.color = Color.clear;
+
+        FadeToWhite.SetActive(true);
+        fadeImage.DOFade(1f, 0.5f).SetEase(Ease.InQuad);
+        yield return new WaitForSeconds(0.5f + float.Epsilon);
+
+        _gameOverImage.DOFade(1f, 0.5f);
+        yield return new WaitForSeconds(1.5f + float.Epsilon);
+        
+        yield return ResetAllThings();
+
+        _gameOverImage.DOFade(0f, 0.5f);
+        fadeImage.DOFade(0f, 0.5f).SetEase(Ease.InQuad);
+        yield return new WaitForSeconds(0.5f);
     }
 
     public IEnumerator ResetAllThings()

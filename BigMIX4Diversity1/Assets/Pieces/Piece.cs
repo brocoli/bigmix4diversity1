@@ -293,5 +293,11 @@ namespace Assets.Pieces
             var canvas = GameObject.FindWithTag("Canvas");
             StartCoroutine(canvas.GetComponent<MainMenuRoutine>().WinGame());
         }
+
+        public void Lose()
+        {
+            var canvas = GameObject.FindWithTag("Canvas");
+            StartCoroutine(canvas.GetComponent<MainMenuRoutine>().LoseGame());
+        }
     }
 }
