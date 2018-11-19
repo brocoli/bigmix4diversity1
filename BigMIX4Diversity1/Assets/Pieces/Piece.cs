@@ -33,7 +33,7 @@ namespace Assets.Pieces
         {
             var windowHeight = PieceRandomizer.WindowHeight;
 
-            _minCameraY = Camera.main.transform.position.y;
+            _minCameraY = -10f;
             _maxCameraY = GameObject.FindWithTag("Background").GetComponent<SpriteRenderer>().bounds.max.y - windowHeight;
 
             _yReferences = GameObject.FindWithTag("YReferences");

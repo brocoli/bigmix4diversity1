@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Assets.Pieces;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,7 +7,7 @@ using UnityEngine.UI;
 public class MainMenuRoutine : MonoBehaviour
 {
     [Header("Sprites")]
-    public Texture BackgroundNoLight;
+    public Sprite BackgroundNoLight;
     public Sprite BackgroundWithLight;
     public Sprite SoundOn;
     public Sprite SoundOff;
@@ -15,6 +16,7 @@ public class MainMenuRoutine : MonoBehaviour
     public GameObject MainMenu;
     public GameObject CreditsMenu;
     public GameObject Background;
+    public GameObject Foreground;
     public GameObject LightBeam;
     public GameObject FadeToWhite;
     public GameObject Logo;
@@ -40,8 +42,10 @@ public class MainMenuRoutine : MonoBehaviour
 
     private RectTransform _menuTransform;
     private Transform _bgTransform;
+    private Transform _fgTransform;
 
     private SpriteRenderer _bgImage;
+    private SpriteRenderer _fgImage;
     private RawImage _logoImage;
     private Animator _lightAnimator;
 
@@ -53,9 +57,11 @@ public class MainMenuRoutine : MonoBehaviour
     public void Awake()
     {
         _bgTransform = Background.transform;
+        _fgTransform = Foreground.transform;
         _menuTransform = MainMenu.GetComponent<RectTransform>();
 
         _bgImage = Background.GetComponent<SpriteRenderer>();
+        _fgImage = Foreground.GetComponent<SpriteRenderer>();
         _logoImage = Logo.GetComponent<RawImage>();
 
         _lightAnimator = LightBeam.GetComponent<Animator>();
@@ -72,6 +78,7 @@ public class MainMenuRoutine : MonoBehaviour
         _menuTransform.DOScale(new Vector3(100.5f, 100.5f, 1), ZoomPeriod).SetEase(Ease.InCubic).OnStart(() =>
         {
             _bgTransform.DOScale(new Vector3(4f, 4f, 1), ZoomPeriod + 10f).SetEase(Ease.InCubic);
+            _fgTransform.DOScale(new Vector3(4f, 4f, 1), ZoomPeriod + 10f).SetEase(Ease.InCubic);
 
             _logoImage.DOColor(Color.clear, (float) ZoomPeriod / 2).SetDelay((float) ZoomPeriod / 2)
                 .OnComplete(() =>
@@ -107,6 +114,7 @@ public class MainMenuRoutine : MonoBehaviour
     {
         yield return new WaitForSeconds(_lightAnimator.GetCurrentAnimatorClipInfo(0).Length + 3);
         _bgImage.sprite = BackgroundWithLight;
+        _fgImage.sprite = BackgroundWithLight;
         LightBeam.SetActive(false);
         Spawner.SetActive(true);
     }
@@ -155,7 +163,11 @@ public class MainMenuRoutine : MonoBehaviour
 
     public IEnumerator ResetAllThings()
     {
+        _bgImage.sprite = BackgroundNoLight;
+        _fgImage.sprite = BackgroundNoLight;
+
         _bgTransform.transform.localScale = new Vector3(3.4f, 3.4f, 1f);
+        _fgTransform.transform.localScale = new Vector3(3.4f, 3.4f, 1f);
         _menuTransform.transform.localScale = new Vector3(1f, 1f, 1f);
         LightBeam.SetActive(false);
         _logoImage.color = Color.white;
@@ -167,6 +179,7 @@ public class MainMenuRoutine : MonoBehaviour
             pos.y = -15f;
             t.position = pos;
         }
+        Spawner.GetComponent<PieceRandomizer>().MaxReferenceY = -15f;
 
         yield return new WaitForSeconds(0.5f);
 
