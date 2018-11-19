@@ -16,8 +16,8 @@ namespace Assets.Pieces
 
         private GameObject _yReferences;
 
-        private PolygonCollider2D _polygonCollider2D;
-        private bool _isInPlay;
+        public PolygonCollider2D PolygonCollider2D;
+        public bool IsInPlay;
 
         private Vector2 _mouseDownPointerPos;
         private Vector2 _mouseDownPiecePos;
@@ -28,17 +28,6 @@ namespace Assets.Pieces
 
         private float _minCameraY;
         private float _maxCameraY;
-
-        public void Awake()
-        {
-            var p = transform.position;
-            p.z = -2f;
-            transform.position = p;
-            transform.SetAsFirstSibling();
-
-            var pos = transform.position;
-            transform.position = pos;
-        }
 
         public void Start()
         {
@@ -58,10 +47,10 @@ namespace Assets.Pieces
 
         private void BuildCollider(Vector2[] vertices2D)
         {
-            _polygonCollider2D = gameObject.AddComponent(typeof(PolygonCollider2D)) as PolygonCollider2D;
-            Debug.Assert(_polygonCollider2D != null, nameof(_polygonCollider2D) + " != null");
+            PolygonCollider2D = gameObject.AddComponent(typeof(PolygonCollider2D)) as PolygonCollider2D;
+            Debug.Assert(PolygonCollider2D != null, nameof(PolygonCollider2D) + " != null");
 
-            _polygonCollider2D.SetPath(0, vertices2D);
+            PolygonCollider2D.SetPath(0, vertices2D);
         }
 
         private void BuildMesh(Vector2[] vertices2D)
@@ -130,7 +119,7 @@ namespace Assets.Pieces
 
         public void OnPieceTouchDown()
         {
-            if (_isInPlay)
+            if (IsInPlay)
             {
                 return;
             }
@@ -140,11 +129,21 @@ namespace Assets.Pieces
 
             _mouseDownPointerPos = new Vector2(mousePos.x, mousePos.y);
             _mouseDownPiecePos = new Vector2(piecePos.x, piecePos.y);
+
+            foreach (var otherPiece in PieceRandomizer.PiecesToSelect)
+            {
+                if (otherPiece == this)
+                {
+                    continue;
+                }
+
+                otherPiece.PolygonCollider2D.enabled = false;
+            }
         }
 
         public void OnPieceTouch()
         {
-            if (_isInPlay)
+            if (IsInPlay)
             {
                 return;
             }
@@ -161,13 +160,23 @@ namespace Assets.Pieces
 
         public void OnPieceTouchUp()
         {
-            if (_isInPlay)
+            if (IsInPlay)
             {
                 return;
             }
 
 
             PutIntoPlay();
+
+            foreach (var otherPiece in PieceRandomizer.PiecesToSelect)
+            {
+                if (otherPiece == this)
+                {
+                    continue;
+                }
+
+                otherPiece.PolygonCollider2D.enabled = true;
+            }
         }
 
         private void PutIntoPlay()
@@ -184,14 +193,14 @@ namespace Assets.Pieces
             {
                 var referencePoint = referencesTransforms[i].position;
 
-                var hitFromBelow = Physics2D.Raycast(new Vector2(referencePoint.x, _polygonCollider2D.bounds.min.y - float.Epsilon), Vector2.up);
-                if (hitFromBelow.collider != _polygonCollider2D)
+                var hitFromBelow = Physics2D.Raycast(new Vector2(referencePoint.x, PolygonCollider2D.bounds.min.y - float.Epsilon), Vector2.up);
+                if (hitFromBelow.collider != PolygonCollider2D)
                 {
                     continue;
                 }
 
                 var hitFromBelowY = hitFromBelow.point.y;
-                var hitFromAbove = Physics2D.Raycast(new Vector2(referencePoint.x, _polygonCollider2D.bounds.max.y + float.Epsilon), Vector2.down);
+                var hitFromAbove = Physics2D.Raycast(new Vector2(referencePoint.x, PolygonCollider2D.bounds.max.y + float.Epsilon), Vector2.down);
                 Debug.Assert(hitFromAbove.collider != null, "wtf is this? I can hit from below but not above?");
 
                 affectedReferencePoints.Add(i);
@@ -266,16 +275,23 @@ namespace Assets.Pieces
                     var spawnerPos = PieceRandomizer.transform.position;
                     spawnerPos.y = targetY + windowHeight * 3/4;
                     PieceRandomizer.transform.position = spawnerPos;
+
+                    if (targetY == _maxCameraY) // This floating point comparison should be kept exact (no epsilon).
+                    {
+                        Win();
+                    }
                 }
             }
 
             transform.DOMoveY(transform.position.y - amountMoveDown, TransitionDownTime);
-            _isInPlay = true;
+            IsInPlay = true;
+            PolygonCollider2D.enabled = false;
         }
 
-        public bool IsInPlay()
+        public void Win()
         {
-            return _isInPlay;
+            var canvas = GameObject.FindWithTag("Canvas");
+            StartCoroutine(canvas.GetComponent<MainMenuRoutine>().WinGame());
         }
     }
 }

@@ -6,6 +6,8 @@ TagManager:
   tags:
   - YReferences
   - Background
+  - Canvas
+  - Pieces
   layers:
   - Default
   - TransparentFX

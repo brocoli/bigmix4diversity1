@@ -21,31 +21,26 @@ namespace Assets.Pieces
 
         public float SpawnDistance = 5f;
 
-        private readonly Piece[] _pieces = new Piece[3];
+        public readonly Piece[] PiecesToSelect = new Piece[3];
         public float WindowHeight;
 
         public void Start()
         {
             WindowHeight = Camera.main.ScreenToWorldPoint(new Vector3(0, Screen.height, 0)).y;
-
-            for (var i = 0; i < 3; i++)
-            {
-                SpawnPiece(i);
-            }
         }
 
         public void Update()
         {
-            for (var i = 0; i < _pieces.Length; i++)
+            for (var i = 0; i < PiecesToSelect.Length; i++)
             {
-                var piece = _pieces[i];
-
-                if (piece == null || !piece.IsInPlay())
+                var piece = PiecesToSelect[i];
+                
+                if (piece != null && !piece.IsInPlay)
                 {
                     continue;
                 }
 
-                _pieces[i] = null;
+                PiecesToSelect[i] = null;
                 SpawnPiece(i);
             }
         }
@@ -62,11 +57,12 @@ namespace Assets.Pieces
             var vertices2D = GenerateGoodVertices(amountVertices);
 
             var newPieceObject = Instantiate(PiecePrefab, position, rotation);
+            newPieceObject.tag = "Pieces";
             var newPiece = newPieceObject.GetComponent<Piece>();
             newPiece.PieceRandomizer = this;
 
             newPiece.InitVertices(vertices2D);
-            _pieces[slot] = newPiece;
+            PiecesToSelect[slot] = newPiece;
         }
 
         private Vector2[] GenerateGoodVertices(int amountVertices)

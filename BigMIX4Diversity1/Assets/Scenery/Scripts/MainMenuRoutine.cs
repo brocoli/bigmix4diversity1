@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Assets.Pieces;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,6 +18,7 @@ public class MainMenuRoutine : MonoBehaviour
     public GameObject CreditsMenu;
     public GameObject Background;
     public GameObject LightBeam;
+    public GameObject FadeToWhite;
     public GameObject Logo;
     public GameObject SoundButton;
     public GameObject CreditsButton;
@@ -50,7 +52,7 @@ public class MainMenuRoutine : MonoBehaviour
 
     public void Awake()
     {
-        _bgTransform = Background.GetComponent<RectTransform>();
+        _bgTransform = Background.transform;
         _menuTransform = MainMenu.GetComponent<RectTransform>();
 
         _bgImage = Background.GetComponent<SpriteRenderer>();
@@ -105,6 +107,63 @@ public class MainMenuRoutine : MonoBehaviour
         _bgImage.sprite = BackgroundWithLight;
         LightBeam.SetActive(false);
         Spawner.SetActive(true);
+    }
+
+    public IEnumerator WinGame()
+    {
+        LightBeam.SetActive(true);
+        yield return new WaitForSeconds(_lightAnimator.GetCurrentAnimatorClipInfo(0).Length + 1);
+
+        FadeToWhite.SetActive(true);
+        FadeToWhite.GetComponent<Image>().DOColor(Color.white, 1f).SetEase(Ease.InQuad);
+        yield return new WaitForSeconds(3f + float.Epsilon);
+
+        yield return ResetAllThings();
+
+        CreditsButton.SetActive(true);
+        ShowCredits();
+
+        FadeToWhite.GetComponent<Image>().DOColor(Color.clear, 1.5f);
+        yield return new WaitForSeconds(1.5f + float.Epsilon);
+
+        yield return new WaitForSeconds(2f);
+    }
+
+    public void LoseGame()
+    {
+    }
+
+    public IEnumerator ResetAllThings()
+    {
+        _bgTransform.transform.localScale = new Vector3(3.4f, 3.4f, 1f);
+        _menuTransform.transform.localScale = new Vector3(1f, 1f, 1f);
+        LightBeam.SetActive(false);
+        _logoImage.color = Color.white;
+
+        var yReferences = GameObject.FindWithTag("YReferences");
+        foreach (Transform t in yReferences.transform)
+        {
+            var pos = t.position;
+            pos.y = -15f;
+            t.position = pos;
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
+        var pieces = GameObject.FindGameObjectsWithTag("Pieces");
+        foreach (var pieceObject in pieces)
+        {
+            GameObject.Destroy(pieceObject);
+        }
+
+        var spawnerPos = Spawner.transform.position;
+        spawnerPos.y = 12.21f;
+        Spawner.transform.position = spawnerPos;
+        Spawner.SetActive(false);
+
+        var cameraPos = Camera.main.transform.position;
+        cameraPos.y = 0;
+        Camera.main.transform.position = cameraPos;
     }
 
     public void ShowCredits()
