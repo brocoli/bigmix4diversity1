@@ -177,6 +177,8 @@ public class MainMenuRoutine : MonoBehaviour
     {
         if (_gameRunning)
         {
+            _gameRunning = false;
+
             LightBeam.SetActive(true);
             yield return new WaitForSeconds(_lightAnimator.GetCurrentAnimatorClipInfo(0).Length + 1);
 
@@ -213,6 +215,8 @@ public class MainMenuRoutine : MonoBehaviour
     {
         if (_gameRunning)
         {
+            _gameRunning = false;
+
             var fadeImage = FadeToWhite.GetComponent<Image>();
             fadeImage.color = Color.clear;
 
@@ -244,9 +248,8 @@ public class MainMenuRoutine : MonoBehaviour
             //fadeImage.DOFade(0f, 0.5f).SetEase(Ease.InQuad);
             yield return new WaitForSeconds(2.5f);
 
-            SceneManager.LoadScene(0);
-
             _gameRunning = false;
+            SceneManager.LoadScene(0);
         }
         else
         {
