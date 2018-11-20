@@ -67,6 +67,8 @@ public class MainMenuRoutine : MonoBehaviour
 
     private Tween[] _introTweens;
 
+    private bool _gameRunning;
+
     public void Awake()
     {
         _bgTransform = Background.transform;
@@ -86,6 +88,13 @@ public class MainMenuRoutine : MonoBehaviour
 
     public void StartGame()
     {
+        if (_gameRunning)
+        {
+            return;
+        }
+
+        _gameRunning = true;
+
         EffectAudioSource.PlayOneShot(EffectAudioSource.clip);
 
         _introTweens[0] = _menuTransform.DOScale(new Vector3(100.5f, 100.5f, 1), ZoomPeriod).SetEase(Ease.InCubic).OnStart(() =>
@@ -140,45 +149,63 @@ public class MainMenuRoutine : MonoBehaviour
 
     public IEnumerator WinGame()
     {
-        LightBeam.SetActive(true);
-        yield return new WaitForSeconds(_lightAnimator.GetCurrentAnimatorClipInfo(0).Length + 1);
+        if (_gameRunning)
+        {
+            LightBeam.SetActive(true);
+            yield return new WaitForSeconds(_lightAnimator.GetCurrentAnimatorClipInfo(0).Length + 1);
 
-        var fadeImage = FadeToWhite.GetComponent<Image>();
-        fadeImage.color = new UnityEngine.Color(1.0f, 1.0f, 1.0f, 0.0f);
+            var fadeImage = FadeToWhite.GetComponent<Image>();
+            fadeImage.color = new UnityEngine.Color(1.0f, 1.0f, 1.0f, 0.0f);
 
-        FadeToWhite.SetActive(true);
-        fadeImage.DOFade(1f, 1f).SetEase(Ease.InQuad);
-        yield return new WaitForSeconds(1f + float.Epsilon);
+            FadeToWhite.SetActive(true);
+            fadeImage.DOFade(1f, 1f).SetEase(Ease.InQuad);
+            yield return new WaitForSeconds(1f + float.Epsilon);
 
-        yield return ResetAllThings();
+            yield return ResetAllThings();
 
-        ShowCredits();
+            //ShowCredits();
 
-        yield return new WaitForSeconds(1f + float.Epsilon);
+            yield return new WaitForSeconds(1f + float.Epsilon);
 
-        fadeImage.DOFade(0f, 1.5f);
-        yield return new WaitForSeconds(1.5f + float.Epsilon);
+            fadeImage.DOFade(0f, 1.5f);
+            yield return new WaitForSeconds(1.5f + float.Epsilon);
 
-        yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(2f);
+
+            _gameRunning = false;
+        }
+        else
+        {
+            yield return new WaitForSeconds(0f);
+        }
     }
 
     public IEnumerator LoseGame()
     {
-        var fadeImage = FadeToWhite.GetComponent<Image>();
-        fadeImage.color = Color.clear;
+        if (_gameRunning)
+        {
+            var fadeImage = FadeToWhite.GetComponent<Image>();
+            fadeImage.color = Color.clear;
 
-        FadeToWhite.SetActive(true);
-        fadeImage.DOFade(1f, 0.5f).SetEase(Ease.InQuad);
-        yield return new WaitForSeconds(0.5f + float.Epsilon);
+            FadeToWhite.SetActive(true);
+            fadeImage.DOFade(1f, 0.5f).SetEase(Ease.InQuad);
+            yield return new WaitForSeconds(0.5f + float.Epsilon);
 
-        _gameOverImage.DOFade(1f, 0.5f);
-        yield return new WaitForSeconds(1.5f + float.Epsilon);
-        
-        yield return ResetAllThings();
+            _gameOverImage.DOFade(1f, 0.5f);
+            yield return new WaitForSeconds(1.5f + float.Epsilon);
 
-        _gameOverImage.DOFade(0f, 0.5f);
-        fadeImage.DOFade(0f, 0.5f).SetEase(Ease.InQuad);
-        yield return new WaitForSeconds(0.5f);
+            yield return ResetAllThings();
+
+            _gameOverImage.DOFade(0f, 0.5f);
+            fadeImage.DOFade(0f, 0.5f).SetEase(Ease.InQuad);
+            yield return new WaitForSeconds(0.5f);
+
+            _gameRunning = false;
+        }
+        else
+        {
+            yield return new WaitForSeconds(0f);
+        }
     }
 
     public IEnumerator ResetAllThings()
@@ -188,9 +215,14 @@ public class MainMenuRoutine : MonoBehaviour
 
         _bgTransform.transform.localScale = new Vector3(3.4f, 3.4f, 1f);
         _fgTransform.transform.localScale = new Vector3(3.4f, 3.4f, 1f);
+
         _menuTransform.transform.localScale = new Vector3(1f, 1f, 1f);
-        LightBeam.SetActive(false);
+        MainMenu.GetComponent<CanvasGroup>().interactable = true;
+        MainMenu.GetComponent<CanvasGroup>().blocksRaycasts = true;
         _logoImage.color = Color.white;
+        MainMenu.SetActive(true);
+
+        LightBeam.SetActive(false);
 
         var yReferences = GameObject.FindWithTag("YReferences");
         foreach (Transform t in yReferences.transform)
@@ -203,12 +235,6 @@ public class MainMenuRoutine : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
-        var pieces = GameObject.FindGameObjectsWithTag("Pieces");
-        foreach (var pieceObject in pieces)
-        {
-            GameObject.Destroy(pieceObject);
-        }
-
         var spawnerPos = Spawner.transform.position;
         spawnerPos.y = 12.21f;
         Spawner.transform.position = spawnerPos;
@@ -217,6 +243,12 @@ public class MainMenuRoutine : MonoBehaviour
         var cameraPos = Camera.main.transform.position;
         cameraPos.y = 0;
         Camera.main.transform.position = cameraPos;
+
+        var pieces = GameObject.FindGameObjectsWithTag("Pieces");
+        foreach (var pieceObject in pieces)
+        {
+            //GameObject.Destroy(pieceObject);
+        }
     }
 
     public void OpenConfig()
