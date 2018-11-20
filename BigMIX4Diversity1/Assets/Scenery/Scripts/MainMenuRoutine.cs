@@ -41,7 +41,7 @@ public class MainMenuRoutine : MonoBehaviour
     public Text IntroText3;
 
     [Header("Variables")]
-    public int ZoomPeriod = 15;
+    public float ZoomPeriod = 15f;
     public float TextFadeTime = 1f;
     public float TextTime = 4f;
     public float ExtraDelay = 3f;
