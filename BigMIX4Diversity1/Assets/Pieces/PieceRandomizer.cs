@@ -25,6 +25,7 @@ namespace Assets.Pieces
         public float WindowHeight;
 
         public float MaxReferenceY = -15f;
+        private float _pieceOffset;
 
         public void Start()
         {
@@ -52,7 +53,7 @@ namespace Assets.Pieces
             var rotZ = Random.Range(0, 360);
             var posX = SpawnPoint.position.x + (slot - 1) * SpawnDistance;
 
-            var position = new Vector3(posX, SpawnPoint.position.y, SpawnPoint.position.z);
+            var position = new Vector3(posX, SpawnPoint.position.y, SpawnPoint.position.z + _pieceOffset);
             var rotation = new Quaternion(SpawnPoint.rotation.x, SpawnPoint.rotation.y, rotZ, SpawnPoint.rotation.w);
 
             var amountVertices = Random.Range(MinSegments, MaxSegments + 1);
@@ -62,6 +63,8 @@ namespace Assets.Pieces
             newPieceObject.tag = "Pieces";
             var newPiece = newPieceObject.GetComponent<Piece>();
             newPiece.PieceRandomizer = this;
+
+            _pieceOffset += 0.00001f;
 
             newPiece.InitVertices(vertices2D);
             PiecesToSelect[slot] = newPiece;
