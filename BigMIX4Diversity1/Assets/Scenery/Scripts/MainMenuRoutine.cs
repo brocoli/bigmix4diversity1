@@ -92,6 +92,8 @@ public class MainMenuRoutine : MonoBehaviour
         _gameOverImage = GameOver.GetComponentInChildren<RawImage>();
 
         _introTweens = new Tween[10];
+
+        MainAudioSource.DOFade(1f, 2f);
     }
 
     private void WinGameDebug()
@@ -195,7 +197,8 @@ public class MainMenuRoutine : MonoBehaviour
             //fadeImage.DOFade(0f, 1.5f);
             //yield return new WaitForSeconds(1.5f + float.Epsilon);
 
-            yield return new WaitForSeconds(1f);
+            MainAudioSource.DOFade(0f, 2f);
+            yield return new WaitForSeconds(2.1f);
 
             _gameRunning = false;
             SceneManager.LoadScene(0);
@@ -229,8 +232,10 @@ public class MainMenuRoutine : MonoBehaviour
             GameOver.SetActive(true);
             _gameOverImage.DOFade(1f, 0.5f);
             yield return new WaitForSeconds(3.5f + float.Epsilon);
-
-            //yield return ResetAllThings();
+            
+            fadeImage.DOColor(Color.white, 1f).SetEase(Ease.InQuad);
+            MainAudioSource.DOFade(0f, 2f);
+            yield return new WaitForSeconds(2.5f);
 
             _gameOverImage.DOFade(0f, 0.5f);
             GameOver.SetActive(false);
