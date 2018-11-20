@@ -31,6 +31,7 @@ public class MainMenuRoutine : MonoBehaviour
     public GameObject GameOver;
     public GameObject MusicIcon;
     public GameObject SFXIcon;
+    public GameObject GameWin;
 
     [Header("Menus")]
     public GameObject MainMenu;
@@ -47,6 +48,12 @@ public class MainMenuRoutine : MonoBehaviour
     public Text IntroText1;
     public Text IntroText2;
     public Text IntroText3;
+
+    [Header("GameWin Texts")]
+    public Text GameWinText1;
+    public Text GameWinText2;
+    public Text GameWinText3;
+    public Text GameWinText4;
 
     [Header("Variables")]
     public float ZoomPeriod = 15f;
@@ -66,6 +73,7 @@ public class MainMenuRoutine : MonoBehaviour
     private SpriteRenderer _fgImage;
     private RawImage _logoImage;
     private Animator _lightAnimator;
+    private Animator _gameWinAnimator;
 
     private RawImage _gameOverImage;
 
@@ -88,6 +96,7 @@ public class MainMenuRoutine : MonoBehaviour
         _logoImage = Logo.GetComponent<RawImage>();
 
         _lightAnimator = LightBeam.GetComponent<Animator>();
+        _gameWinAnimator = GameWin.GetComponent<Animator>();
 
         _gameOverImage = GameOver.GetComponentInChildren<RawImage>();
 
@@ -198,6 +207,28 @@ public class MainMenuRoutine : MonoBehaviour
 
             //fadeImage.DOFade(0f, 1.5f);
             //yield return new WaitForSeconds(1.5f + float.Epsilon);
+
+
+            MainAudioSource.DOFade(0.5f, 0.5f);
+            yield return new WaitForSeconds(0.5f + float.Epsilon);
+
+            GameWin.SetActive(true);
+            GameWin.GetComponent<Image>().DOFade(1f, 0.6f);
+            yield return new WaitForSeconds(0.6f);
+            _gameWinAnimator.enabled = true;
+            yield return new WaitForSeconds(10.5f);
+            GameWin.GetComponent<Image>().DOColor(new Color(0.6f, 0.6f, 0.6f, 1f), 1.5f);
+            yield return new WaitForSeconds(0.3f);
+
+            GameWinText1.DOFade(1f, 1f);
+            yield return new WaitForSeconds(2f);
+            GameWinText2.DOFade(1f, 1f);
+            yield return new WaitForSeconds(2f);
+            GameWinText3.DOFade(1f, 1f);
+            yield return new WaitForSeconds(2f);
+            GameWinText4.DOFade(1f, 1f);
+            yield return new WaitForSeconds(2f);
+
 
             MainAudioSource.DOFade(0f, 2f);
             yield return new WaitForSeconds(2.1f);
