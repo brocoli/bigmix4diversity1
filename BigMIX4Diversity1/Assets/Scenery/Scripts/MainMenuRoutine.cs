@@ -89,7 +89,7 @@ public class MainMenuRoutine : MonoBehaviour
 
         _lightAnimator = LightBeam.GetComponent<Animator>();
 
-        _gameOverImage = GameOver.GetComponent<RawImage>();
+        _gameOverImage = GameOver.GetComponentInChildren<RawImage>();
 
         _introTweens = new Tween[10];
     }
@@ -216,15 +216,30 @@ public class MainMenuRoutine : MonoBehaviour
             FadeToWhite.SetActive(true);
             fadeImage.DOFade(1f, 0.5f).SetEase(Ease.InQuad);
             yield return new WaitForSeconds(0.5f + float.Epsilon);
+            
+            //_gameOverImage.DOFade(1f, 0.5f);
+            //yield return new WaitForSeconds(1.5f + float.Epsilon);
 
+            //yield return ResetAllThings();
+
+            //_gameOverImage.DOFade(0f, 0.5f);
+            //fadeImage.DOFade(0f, 0.5f).SetEase(Ease.InQuad);
+            //yield return new WaitForSeconds(0.5f);
+
+            GameOver.SetActive(true);
             _gameOverImage.DOFade(1f, 0.5f);
-            yield return new WaitForSeconds(1.5f + float.Epsilon);
+            yield return new WaitForSeconds(3.5f + float.Epsilon);
 
-            yield return ResetAllThings();
+            //yield return ResetAllThings();
 
             _gameOverImage.DOFade(0f, 0.5f);
-            fadeImage.DOFade(0f, 0.5f).SetEase(Ease.InQuad);
-            yield return new WaitForSeconds(0.5f);
+            GameOver.SetActive(false);
+
+            fadeImage.DOColor(Color.white, 1f).SetEase(Ease.InQuad);
+            //fadeImage.DOFade(0f, 0.5f).SetEase(Ease.InQuad);
+            yield return new WaitForSeconds(2.5f);
+
+            SceneManager.LoadScene(0);
 
             _gameRunning = false;
         }
