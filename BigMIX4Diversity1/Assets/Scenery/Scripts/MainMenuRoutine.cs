@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using Assets.Pieces;
 using DG.Tweening;
 using UnityEngine;
@@ -13,17 +14,26 @@ public class MainMenuRoutine : MonoBehaviour
     public Sprite SoundOff;
 
     [Header("GameObjects")]
-    public GameObject MainMenu;
-    public GameObject CreditsMenu;
     public GameObject Background;
     public GameObject Foreground;
     public GameObject LightBeam;
     public GameObject FadeToWhite;
     public GameObject Logo;
-    public GameObject SoundButton;
-    public GameObject CreditsButton;
     public GameObject Spawner;
     public GameObject GameOver;
+    public GameObject MusicIcon;
+    public GameObject SFXIcon;
+
+    [Header("Menus")]
+    public GameObject MainMenu;
+    public GameObject CreditsMenu;
+    public GameObject ConfigMenu;
+    public GameObject QuitMenu;
+
+    [Header("Buttons")]
+    public GameObject ConfigButton;
+    public GameObject CreditsButton;
+    public GameObject SkipIntroButton;
 
     [Header("Introduction Texts")]
     public Text IntroText1;
@@ -31,7 +41,7 @@ public class MainMenuRoutine : MonoBehaviour
     public Text IntroText3;
 
     [Header("Variables")]
-    public int ZoomPeriod;
+    public int ZoomPeriod = 15;
     public float TextFadeTime = 1f;
     public float TextTime = 4f;
     public float ExtraDelay = 3f;
@@ -52,7 +62,10 @@ public class MainMenuRoutine : MonoBehaviour
     private RawImage _gameOverImage;
 
     private bool _menuFlag;
-    private bool _soundFlag;
+    private bool _musicFlag;
+    private bool _sfxFlag;
+
+    private Tween[] _introTweens;
 
     public void Awake()
     {
@@ -67,37 +80,43 @@ public class MainMenuRoutine : MonoBehaviour
         _lightAnimator = LightBeam.GetComponent<Animator>();
 
         _gameOverImage = GameOver.GetComponent<RawImage>();
+
+        _introTweens = new Tween[8];
     }
 
     public void StartGame()
     {
         EffectAudioSource.PlayOneShot(EffectAudioSource.clip);
 
-        CreditsButton.SetActive(false);
-
-        _menuTransform.DOScale(new Vector3(100.5f, 100.5f, 1), ZoomPeriod).SetEase(Ease.InCubic).OnStart(() =>
+        _introTweens[0] = _menuTransform.DOScale(new Vector3(100.5f, 100.5f, 1), ZoomPeriod).SetEase(Ease.InCubic).OnStart(() =>
         {
             _bgTransform.DOScale(new Vector3(4f, 4f, 1), ZoomPeriod + 10f).SetEase(Ease.InCubic);
             _fgTransform.DOScale(new Vector3(4f, 4f, 1), ZoomPeriod + 10f).SetEase(Ease.InCubic);
 
-            _logoImage.DOColor(Color.clear, (float) ZoomPeriod / 2).SetDelay((float) ZoomPeriod / 2)
+            _introTweens[1] = _logoImage.DOColor(Color.clear, (float) ZoomPeriod / 2).SetDelay((float) ZoomPeriod / 2)
                 .OnComplete(() =>
                 {
-                    IntroText1.DOFade(1, TextFadeTime).OnComplete(() =>
+                    SkipIntroButton.SetActive(true);
+                    MainMenu.GetComponent<CanvasGroup>().interactable = false;
+                    MainMenu.GetComponent<CanvasGroup>().blocksRaycasts = false;
+
+                    _introTweens[2] = IntroText1.DOFade(1, TextFadeTime).OnComplete(() =>
                     {
-                        IntroText1.DOFade(0, TextFadeTime).SetDelay(TextTime)
+                        _introTweens[3] = IntroText1.DOFade(0, TextFadeTime).SetDelay(TextTime)
                             .OnComplete(() =>
                             {
-                                IntroText2.DOFade(1, TextFadeTime).OnComplete(() =>
+                                _introTweens[4] = IntroText2.DOFade(1, TextFadeTime).OnComplete(() =>
                                 {
-                                    IntroText2.DOFade(0, TextFadeTime).SetDelay(TextTime)
+                                    _introTweens[5] = IntroText2.DOFade(0, TextFadeTime).SetDelay(TextTime)
                                         .OnComplete(() =>
                                         {
-                                            IntroText3.DOFade(1, TextFadeTime + ExtraDelay).OnComplete(() =>
+                                            _introTweens[6] = IntroText3.DOFade(1, TextFadeTime + ExtraDelay).OnComplete(() =>
                                             {
-                                                IntroText3.DOFade(0, TextFadeTime + ExtraDelay).SetDelay(TextTime)
+                                                _introTweens[7] = IntroText3.DOFade(0, TextFadeTime + ExtraDelay).SetDelay(TextTime)
                                                     .OnComplete(() =>
                                                     {
+                                                        SkipIntroButton.SetActive(false);
+                                                        MainMenu.SetActive(false);
                                                         LightBeam.SetActive(true);
                                                         StartCoroutine(DelayChange());
                                                     });
@@ -133,7 +152,6 @@ public class MainMenuRoutine : MonoBehaviour
 
         yield return ResetAllThings();
 
-        CreditsButton.SetActive(true);
         ShowCredits();
 
         yield return new WaitForSeconds(1f + float.Epsilon);
@@ -201,47 +219,125 @@ public class MainMenuRoutine : MonoBehaviour
         Camera.main.transform.position = cameraPos;
     }
 
-    public void ShowCredits()
+    public void OpenConfig()
     {
         EffectAudioSource.PlayOneShot(EffectAudioSource.clip);
 
         if (MainMenu.GetComponent<CanvasGroup>().alpha > 0 && !_menuFlag)
         {
+            Time.timeScale = 0;
+            ConfigButton.SetActive(false);
+
             _menuFlag = true;
-            MainMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f)
+            MainMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f).SetUpdate(true)
                 .OnComplete(() =>
                 {
                     _menuFlag = false;
-                    CreditsMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f);
+                    ConfigMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
+                    ConfigMenu.GetComponent<CanvasGroup>().interactable = true;
+                    ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = true;
+                });
+        }
+        else if (ConfigMenu.GetComponent<CanvasGroup>().alpha > 0 && !_menuFlag)
+        {
+            Time.timeScale = 1;
+            ConfigButton.SetActive(true);
+
+            _menuFlag = true;
+            ConfigMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f).SetUpdate(true)
+                .OnComplete(() =>
+                {
+                    _menuFlag = false;
+                    MainMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
+                    ConfigMenu.GetComponent<CanvasGroup>().interactable = false;
+                    ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = false;
+                });
+        }
+        else if (!_menuFlag)
+        {
+            Time.timeScale = 0;
+            ConfigButton.SetActive(false);
+
+            _menuFlag = false;
+            ConfigMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f);
+            ConfigMenu.GetComponent<CanvasGroup>().interactable = true;
+            ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = true;
+        }
+        else
+        {
+            Time.timeScale = 1;
+            ConfigButton.SetActive(true);
+
+            _menuFlag = false;
+            ConfigMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f);
+            ConfigMenu.GetComponent<CanvasGroup>().interactable = false;
+            ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = false;
+        }
+    }
+
+    public void ShowCredits()
+    {
+        EffectAudioSource.PlayOneShot(EffectAudioSource.clip);
+
+        if (ConfigMenu.GetComponent<CanvasGroup>().alpha > 0 && !_menuFlag)
+        {
+            CreditsButton.SetActive(true);
+
+            _menuFlag = true;
+            ConfigMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f).SetUpdate(true)
+                .OnComplete(() =>
+                {
+                    _menuFlag = false;
+                    CreditsMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
+                    ConfigMenu.GetComponent<CanvasGroup>().interactable = false;
+                    ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = false;
                 });
         }
         else if (CreditsMenu.GetComponent<CanvasGroup>().alpha > 0 && !_menuFlag)
         {
+            CreditsButton.SetActive(false);
+
             _menuFlag = true;
-            CreditsMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f)
+            CreditsMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f).SetUpdate(true)
                 .OnComplete(() =>
                 {
                     _menuFlag = false;
-                    MainMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f);
+                    ConfigMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
+                    ConfigMenu.GetComponent<CanvasGroup>().interactable = true;
+                    ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = true;
                 });
         }
     }
 
-    public void ChangeSound()
+    public void MuteMusic()
     {
-        if (!_soundFlag)
+        if (!_musicFlag)
         {
-            SoundButton.GetComponent<Image>().sprite = SoundOff;
+            MusicIcon.GetComponent<Image>().sprite = SoundOff;
             MainAudioSource.mute = true;
-            EffectAudioSource.mute = true;
-            _soundFlag = true;
+            _musicFlag = true;
         }
         else
         {
-            SoundButton.GetComponent<Image>().sprite = SoundOn;
+            MusicIcon.GetComponent<Image>().sprite = SoundOn;
             MainAudioSource.mute = false;
+            _musicFlag = false;
+        }
+    }
+
+    public void MuteSFX()
+    {
+        if (!_sfxFlag)
+        {
+            SFXIcon.GetComponent<Image>().sprite = SoundOff;
+            EffectAudioSource.mute = true;
+            _sfxFlag = true;
+        }
+        else
+        {
+            SFXIcon.GetComponent<Image>().sprite = SoundOn;
             EffectAudioSource.mute = false;
-            _soundFlag = false;
+            _sfxFlag = false;
         }
     }
 
@@ -249,17 +345,53 @@ public class MainMenuRoutine : MonoBehaviour
     {
         EffectAudioSource.PlayOneShot(EffectAudioSource.clip);
 
-        if (CreditsMenu.GetComponent<CanvasGroup>().alpha > 0)
+        if (ConfigMenu.GetComponent<CanvasGroup>().alpha > 0 && !_menuFlag)
         {
-            CreditsMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f)
+            _menuFlag = true;
+            ConfigMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f).SetUpdate(true)
                 .OnComplete(() =>
                 {
-                    MainMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f);
+                    _menuFlag = false;
+                    QuitMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
+                    ConfigMenu.GetComponent<CanvasGroup>().interactable = false;
+                    ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = false;
                 });
+        }
+    }
+
+    public void CloseGameConfirmation(bool doYouWantToQuit)
+    {
+        EffectAudioSource.PlayOneShot(EffectAudioSource.clip);
+
+        if (doYouWantToQuit)
+        {
+            Debug.Log("Application.Quit()");
+            Application.Quit();
         }
         else
         {
-            Application.Quit();
+            QuitMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f).SetUpdate(true)
+                .OnComplete(() =>
+                {
+                    _menuFlag = false;
+                    ConfigMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
+                    ConfigMenu.GetComponent<CanvasGroup>().interactable = true;
+                    ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = true;
+                });
         }
+    }
+
+    public void SkipIntro()
+    {
+        foreach (var introTween in _introTweens)
+        {
+            introTween.Complete(false);
+            introTween.Kill();
+        }
+
+        SkipIntroButton.SetActive(false);
+        MainMenu.SetActive(false);
+        LightBeam.SetActive(true);
+        StartCoroutine(DelayChange());
     }
 }
