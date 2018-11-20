@@ -136,6 +136,8 @@ public class MainMenuRoutine : MonoBehaviour
         CreditsButton.SetActive(true);
         ShowCredits();
 
+        yield return new WaitForSeconds(1f + float.Epsilon);
+
         fadeImage.DOFade(0f, 1.5f);
         yield return new WaitForSeconds(1.5f + float.Epsilon);
 
