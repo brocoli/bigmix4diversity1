@@ -564,7 +564,7 @@ Prefab:
     - target: {fileID: 114608762088961486, guid: 276b2ec253e29414da863d3bad88878a,
         type: 2}
       propertyPath: ExtraDelay
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 114974399854684210, guid: 276b2ec253e29414da863d3bad88878a,
         type: 2}
