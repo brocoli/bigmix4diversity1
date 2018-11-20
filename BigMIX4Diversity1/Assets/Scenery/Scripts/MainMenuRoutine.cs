@@ -233,9 +233,8 @@ public class MainMenuRoutine : MonoBehaviour
                 .OnComplete(() =>
                 {
                     _menuFlag = false;
+                    ConfigMenu.SetActive(true);
                     ConfigMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
-                    ConfigMenu.GetComponent<CanvasGroup>().interactable = true;
-                    ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = true;
                 });
         }
         else if (ConfigMenu.GetComponent<CanvasGroup>().alpha > 0 && !_menuFlag)
@@ -249,8 +248,7 @@ public class MainMenuRoutine : MonoBehaviour
                 {
                     _menuFlag = false;
                     MainMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
-                    ConfigMenu.GetComponent<CanvasGroup>().interactable = false;
-                    ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = false;
+                    ConfigMenu.SetActive(false);
                 });
         }
         else if (!_menuFlag)
@@ -259,9 +257,8 @@ public class MainMenuRoutine : MonoBehaviour
             ConfigButton.SetActive(false);
 
             _menuFlag = false;
+            ConfigMenu.SetActive(true);
             ConfigMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f);
-            ConfigMenu.GetComponent<CanvasGroup>().interactable = true;
-            ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = true;
         }
         else
         {
@@ -270,8 +267,7 @@ public class MainMenuRoutine : MonoBehaviour
 
             _menuFlag = false;
             ConfigMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f);
-            ConfigMenu.GetComponent<CanvasGroup>().interactable = false;
-            ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = false;
+            ConfigMenu.SetActive(false);
         }
     }
 
@@ -288,9 +284,9 @@ public class MainMenuRoutine : MonoBehaviour
                 .OnComplete(() =>
                 {
                     _menuFlag = false;
+                    ConfigMenu.SetActive(false);
+                    CreditsMenu.SetActive(true);
                     CreditsMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
-                    ConfigMenu.GetComponent<CanvasGroup>().interactable = false;
-                    ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = false;
                 });
         }
         else if (CreditsMenu.GetComponent<CanvasGroup>().alpha > 0 && !_menuFlag)
@@ -302,9 +298,9 @@ public class MainMenuRoutine : MonoBehaviour
                 .OnComplete(() =>
                 {
                     _menuFlag = false;
+                    ConfigMenu.SetActive(true);
+                    CreditsMenu.SetActive(false);
                     ConfigMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
-                    ConfigMenu.GetComponent<CanvasGroup>().interactable = true;
-                    ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = true;
                 });
         }
     }
@@ -352,9 +348,9 @@ public class MainMenuRoutine : MonoBehaviour
                 .OnComplete(() =>
                 {
                     _menuFlag = false;
+                    ConfigMenu.SetActive(false);
+                    QuitMenu.SetActive(true);
                     QuitMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
-                    ConfigMenu.GetComponent<CanvasGroup>().interactable = false;
-                    ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = false;
                 });
         }
     }
@@ -374,9 +370,9 @@ public class MainMenuRoutine : MonoBehaviour
                 .OnComplete(() =>
                 {
                     _menuFlag = false;
+                    ConfigMenu.SetActive(true);
+                    QuitMenu.SetActive(false);
                     ConfigMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
-                    ConfigMenu.GetComponent<CanvasGroup>().interactable = true;
-                    ConfigMenu.GetComponent<CanvasGroup>().blocksRaycasts = true;
                 });
         }
     }
