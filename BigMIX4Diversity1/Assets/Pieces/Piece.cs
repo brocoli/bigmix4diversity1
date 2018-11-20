@@ -290,7 +290,7 @@ namespace Assets.Pieces
 
             transform.DOMoveY(transform.position.y - amountMoveDown, TransitionDownTime).OnComplete(() =>
             {
-                _audioSource.PlayOneShot(_audioSource.clip);
+                GameObject.FindGameObjectWithTag("EffectsAudioSource").GetComponent<AudioSource>().PlayOneShot(_audioSource.clip, 0.5f);
             });
             IsInPlay = true;
             PolygonCollider2D.enabled = false;

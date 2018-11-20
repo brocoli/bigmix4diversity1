@@ -1493,16 +1493,6 @@ Prefab:
       propertyPath: m_AnchoredPosition.y
       value: -257
       objectReference: {fileID: 0}
-    - target: {fileID: 224287341866483846, guid: db7e99a9536996d42890737fa1127fd1,
-        type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224287341866483846, guid: db7e99a9536996d42890737fa1127fd1,
-        type: 2}
-      propertyPath: m_SizeDelta.x
-      value: -600
-      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114956632881120720, guid: db7e99a9536996d42890737fa1127fd1, type: 2}
   m_SourcePrefab: {fileID: 100100000, guid: db7e99a9536996d42890737fa1127fd1, type: 2}
@@ -2618,7 +2608,7 @@ GameObject:
   - component: {fileID: 2019188140}
   m_Layer: 0
   m_Name: EffectAudioSource
-  m_TagString: Untagged
+  m_TagString: EffectsAudioSource
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
