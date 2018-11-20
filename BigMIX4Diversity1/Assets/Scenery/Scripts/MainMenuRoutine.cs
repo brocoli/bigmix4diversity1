@@ -2,11 +2,19 @@
 using System.Collections.Generic;
 using Assets.Pieces;
 using DG.Tweening;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainMenuRoutine : MonoBehaviour
 {
+    [Header("Debug")]
+    [InspectorButton("WinGameDebug", ButtonWidth = 200)]
+    public bool WinGameDebugButton;
+    [InspectorButton("LoseGameDebug", ButtonWidth = 200)]
+    public bool LoseGameDebugButton;
+
     [Header("Sprites")]
     public Sprite BackgroundNoLight;
     public Sprite BackgroundWithLight;
@@ -81,7 +89,23 @@ public class MainMenuRoutine : MonoBehaviour
 
         _gameOverImage = GameOver.GetComponent<RawImage>();
 
-        _introTweens = new Tween[8];
+        _introTweens = new Tween[10];
+    }
+
+    private void WinGameDebug()
+    {
+        if (EditorApplication.isPlaying)
+            StartCoroutine(WinGame());
+        else
+            Debug.LogError("This button should only be used in play mode");
+    }
+
+    private void LoseGameDebug()
+    {
+        if (EditorApplication.isPlaying)
+            StartCoroutine(LoseGame());
+        else
+            Debug.LogError("This button should only be used in play mode");
     }
 
     public void StartGame()
@@ -90,29 +114,29 @@ public class MainMenuRoutine : MonoBehaviour
 
         _introTweens[0] = _menuTransform.DOScale(new Vector3(100.5f, 100.5f, 1), ZoomPeriod).SetEase(Ease.InCubic).OnStart(() =>
         {
-            _bgTransform.DOScale(new Vector3(4f, 4f, 1), ZoomPeriod + 10f).SetEase(Ease.InCubic);
-            _fgTransform.DOScale(new Vector3(4f, 4f, 1), ZoomPeriod + 10f).SetEase(Ease.InCubic);
+            _introTweens[1] = _bgTransform.DOScale(new Vector3(4f, 4f, 1), ZoomPeriod + 10f).SetEase(Ease.InCubic);
+            _introTweens[2] = _fgTransform.DOScale(new Vector3(4f, 4f, 1), ZoomPeriod + 10f).SetEase(Ease.InCubic);
 
-            _introTweens[1] = _logoImage.DOColor(Color.clear, (float) ZoomPeriod / 2).SetDelay((float) ZoomPeriod / 2)
+            _introTweens[3] = _logoImage.DOColor(Color.clear, (float) ZoomPeriod / 2).SetDelay((float) ZoomPeriod / 2)
                 .OnComplete(() =>
                 {
                     SkipIntroButton.SetActive(true);
                     MainMenu.GetComponent<CanvasGroup>().interactable = false;
                     MainMenu.GetComponent<CanvasGroup>().blocksRaycasts = false;
 
-                    _introTweens[2] = IntroText1.DOFade(1, TextFadeTime).OnComplete(() =>
+                    _introTweens[4] = IntroText1.DOFade(1, TextFadeTime).OnComplete(() =>
                     {
-                        _introTweens[3] = IntroText1.DOFade(0, TextFadeTime).SetDelay(TextTime)
+                        _introTweens[5] = IntroText1.DOFade(0, TextFadeTime).SetDelay(TextTime)
                             .OnComplete(() =>
                             {
-                                _introTweens[4] = IntroText2.DOFade(1, TextFadeTime).OnComplete(() =>
+                                _introTweens[6] = IntroText2.DOFade(1, TextFadeTime).OnComplete(() =>
                                 {
-                                    _introTweens[5] = IntroText2.DOFade(0, TextFadeTime).SetDelay(TextTime)
+                                    _introTweens[7] = IntroText2.DOFade(0, TextFadeTime).SetDelay(TextTime)
                                         .OnComplete(() =>
                                         {
-                                            _introTweens[6] = IntroText3.DOFade(1, TextFadeTime + ExtraDelay).OnComplete(() =>
+                                            _introTweens[8] = IntroText3.DOFade(1, TextFadeTime + ExtraDelay).OnComplete(() =>
                                             {
-                                                _introTweens[7] = IntroText3.DOFade(0, TextFadeTime + ExtraDelay).SetDelay(TextTime)
+                                                _introTweens[9] = IntroText3.DOFade(0, TextFadeTime + ExtraDelay).SetDelay(TextTime)
                                                     .OnComplete(() =>
                                                     {
                                                         SkipIntroButton.SetActive(false);
@@ -150,16 +174,20 @@ public class MainMenuRoutine : MonoBehaviour
         fadeImage.DOFade(1f, 1f).SetEase(Ease.InQuad);
         yield return new WaitForSeconds(1f + float.Epsilon);
 
-        yield return ResetAllThings();
+        //yield return ResetAllThings();
 
         ShowCredits();
 
-        yield return new WaitForSeconds(1f + float.Epsilon);
+        yield return new WaitForSeconds(6f + float.Epsilon);
 
-        fadeImage.DOFade(0f, 1.5f);
-        yield return new WaitForSeconds(1.5f + float.Epsilon);
+        //fadeImage.DOFade(0f, 1.5f);
+        //yield return new WaitForSeconds(1.5f + float.Epsilon);
 
-        yield return new WaitForSeconds(2f);
+        HideCredits();
+
+        yield return new WaitForSeconds(3f);
+
+        SceneManager.LoadScene(0);
     }
 
     public IEnumerator LoseGame()
@@ -303,7 +331,19 @@ public class MainMenuRoutine : MonoBehaviour
                     ConfigMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
                 });
         }
+        else
+        {
+            CreditsMenu.SetActive(true);
+            CreditsMenu.GetComponent<CanvasGroup>().DOFade(1, 0.5f).SetUpdate(true);
+        }
     }
+
+    public void HideCredits()
+    {
+        CreditsMenu.GetComponent<CanvasGroup>().DOFade(0, 0.5f).SetUpdate(true);
+        CreditsMenu.SetActive(false);
+    }
+
 
     public void MuteMusic()
     {
